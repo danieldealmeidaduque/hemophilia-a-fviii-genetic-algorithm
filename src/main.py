@@ -1,9 +1,32 @@
+import pygad
+import numpy as np
+from time import process_time
 from os.path import abspath, join, dirname
 
-from preprocessing import initial_df, filter_df_for_ga
-from hemaGA import Gene
+from auxiliar import finished_time
+from preprocessing import initial_df
+from hemaGA import Gene, Chromossome
 
-# from hemaGA import hemaGA, get_initial_pop, get_X, get_Y_true
+# ---- GA CONSTANTS ----
+
+# number of generations
+NUM_GENERATIONS = 50
+# number of solutions to be selected as parents
+NUM_PARENTS_MATING = 5
+# number of solutions (chromossomes)
+SOL_PER_POP = 50
+# sss | rws | rank | tournament
+PARENT_SELECTION_TYPE = "rank"
+# number of parents to keep in the current population
+KEEP_PARENTS = 1
+# single_point | two_points | uniform | scattered | a custom crossover function
+CROSSOVER_TYPE = "uniform"
+# probability of crossover
+CROSSOVER_PROBABILITY = 0.5
+# random | swap | inversion | scramble | adaptive | a custom mutation function
+MUTATION_TYPE = "random"
+# percentage of genes to mutate
+MUTATION_PERCENT_GENES = 10
 
 if __name__ == '__main__':
     '''Get initial data and execute genetic algorithm'''
@@ -21,33 +44,68 @@ if __name__ == '__main__':
 
     df = initial_df(input_pm_path, input_dm_path, input_rsa_path)
 
-    print('\n\n\t\tCLASSES!!!!\n\n')
-    chromossome = df.groupby(['wild_aa', 'new_aa'])  # chromossomes
+    # ---- GENETIC ALGORITHM ----
 
-    for gene_k, gene_v in chromossome:
-        g1 = Gene(gene_k, gene_v)
-        g1.calculateFitness(1.5)
-        g1.normalizeFitness()
-        g1.discretizeFitness()
-        print(g1)
-        g1.confusionMatrix()
-        break
+    print('\n\n')
+    chromossome_df = df.groupby(['wild_aa', 'new_aa'])
+    num_genes = len(chromossome_df)
+    chromossome_vector = [Gene(k, v) for k, v in chromossome_df]
+    chromossome_class = Chromossome(chromossome_vector)
+    print(chromossome_class)
+
+    # for gene_k, gene_v in chromossome:
+    #     g1 = Gene(gene_k, gene_v)
+    #     g1.calculateFitness(1.5)
+    #     g1.normalizeFitness()
+    #     g1.discretizeFitness()
+    #     cm = g1.confusionMatrix()
+    #     s = g1.predictionScore()
+    #     y_true = g1.getYTrue()
+    #     y_pred = g1.getYPred()
 
 
-# ''' Genetic Algorithm'''
-# df_ga = filter_df_for_ga(df)
+def ga(df):
+    '''function to execute the genetic algorithm'''
+    ga_start_time = process_time()
+    # chromossome_df = df.groupby(['wild_aa', 'new_aa'])
+    # num_genes = len(chromossome_df)
+    # chromossome_vector = [Gene(k, v) for k, v in chromossome_df]
+    # chromossome_class = Chromossome(chromossome_vector)
 
-# POP_SIZE = 50
-# NUM_GENS = 10
-# N_MATH_FUNC = 4
+    def fitness_func(solution, solution_idx):
+        '''pygad fitness function to give as a parameter'''
 
-# initial_pop = get_initial_pop(df_ga, POP_SIZE)
-# y_true = get_Y_true(df_ga)
-# X = get_X(df_ga)
+        # c_fitness = chromosome_fitness(solution)
+        # solution_fitness = np.mean(c_fitness)
+        return solution_fitness
 
-# # n = n_best_math_func(plot=False)
-# solution, solution_idx, solution_fitness = hemaGA(
-#     df_ga, initial_pop, num_gens=NUM_GENS, n=N_MATH_FUNC, plot=False)
+    def prepare_ga():
+        '''function to prepare ga parameters'''
 
-# cf_matrix = confusion_matrix(y_true, solution, normalize='true')
-# plot_cf_matrix(cf_matrix)
+        fitness_function = fitness_func
+
+        ga_instance = pygad.GA(num_generations=NUM_GENERATIONS,
+                               num_parents_mating=NUM_PARENTS_MATING,
+                               fitness_func=fitness_function,
+                               sol_per_pop=SOL_PER_POP,
+                               num_genes=num_genes,
+                               parent_selection_type=PARENT_SELECTION_TYPE,
+                               keep_parents=KEEP_PARENTS,
+                               crossover_type=CROSSOVER_TYPE,
+                               crossover_probability=CROSSOVER_PROBABILITY,
+                               mutation_type=MUTATION_TYPE,
+                               mutation_percent_genes=MUTATION_PERCENT_GENES)
+
+        return ga_instance
+
+    # prepare ga instance
+    ga_instance = prepare_ga()
+    # run ga instance
+    ga_instance.run()
+    # get output parameters
+    solution, solution_fitness, solution_idx = ga_instance.best_solution()
+    # plot fitness function per generation
+    ga_instance.plot_fitness()
+
+    finished_time(ga_start_time, 'GA ALGORITHM')
+    return solution, solution_idx, solution_fitness

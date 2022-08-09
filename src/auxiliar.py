@@ -7,6 +7,7 @@ from time import process_time
 from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, f1_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 sev2int = {
     'Mild': 0,
@@ -73,9 +74,18 @@ def strip_string(s):
 
 
 @ exception_handler
-def create_cf_matrix(y_true, y_pred):
-    '''create the confusion matrix'''
-    return confusion_matrix(y_true, y_pred)
+def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
+    labels = ['Mild', 'Moderate', 'Severe']
+
+    cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
+
+    if plot:
+        disp = ConfusionMatrixDisplay(cm, labels)
+        disp.plot()
+        plt.title('Confusion Matrix normalized by row')
+        plt.show()
+
+    return cm
 
 
 @ exception_handler

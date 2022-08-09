@@ -8,25 +8,34 @@ from sklearn.metrics import accuracy_score
 from math_func import math_func
 from auxiliar import discretize_to_severity, min_max_normalization, finished_time, sev2int
 from auxiliar import sum_diagonal_cf_matrix, exception_handler, math_func2string
-from auxiliar import format
+from auxiliar import format, scores, create_confusion_matrix
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 n = 4  # dist * rsa
 
 
 class Gene():
-    '''Gene is a dataframe grouped by same mutation'''
+    '''Gene is one dataframe grouped by same mutation'''
 
     def __init__(self, df_key, df_value):
         self.wild_aa, self.new_aa = df_key
-        self.fitness = 0
         self.df = df_value
+        self.score = 0
+        self.cm = 0
 
     def __str__(self):
-        print(f'\nGENE \n{self.wild_aa} -> {self.new_aa}')
-        print(f'Fitness: {self.fitness}')
-        print(self.df)
+        print(f'\tGENE = {self.wild_aa} -> {self.new_aa}', end=' | ')
+        print(f'{len(self.df)} mutations', end='')
+        if not isinstance(self.cm, int):
+            print(f'Confusion Matrix: \n{self.cm}')
+        # print(self.df)
         return ''
+
+    def getYTrue(self):
+        return self.df['severity']
+
+    def getYPred(self):
+        return self.df['fitness_discretized']
 
     def calculateFitness(self, s):
         def fitness(x):
@@ -39,7 +48,6 @@ class Gene():
     def normalizeFitness(self):
         fitness = self.df['fitness'].values.copy()
         min, max = fitness.min(), fitness.max()
-
         if max - min != 0:
             fitness_normalized = [(v - min) / (max - min) for v in fitness]
 
@@ -57,57 +65,56 @@ class Gene():
         self.df['fitness_discretized'] = self.df['fitness_normalized'].apply(
             discretize)
 
-    def confusionMatrix(self):
+    def predictionScore(self):
         y_true = self.df['severity']
         y_pred = self.df['fitness_discretized']
-        cf_labels = ['Mild', 'Moderate', 'Severe']
 
-        cf_matrix = confusion_matrix(
-            y_true, y_pred, labels=cf_labels, normalize='true')
+        self.score = scores(y_true, y_pred)
 
-        disp = ConfusionMatrixDisplay(
-            confusion_matrix=cf_matrix, display_labels=cf_labels)
+    def confusionMatrix(self, normalize=None, plot=False):
+        y_true = self.df['severity']
+        y_pred = self.df['fitness_discretized']
 
-        disp.plot()
-        plt.show()
-
-    '''def gene_fitness(row):
-            #function to calculate gene fitness
-            s = row.solution
-            rsa_vector = row.rsa
-            y_true = row.sev
-
-            
-            # normalize the chromossome fitness between 0 and 1
-            fitness_vector_normalized = min_max_normalization(fitness_vector)
-
-            # discretize the chromossome fitness
-            fitness_vector_discretized = discretize_to_severity(
-                fitness_vector_normalized)
-
-            y_pred = fitness_vector_discretized
-
-            acc = accuracy_score(y_true, y_pred)
-            # matriz de distancias
-            hits = sum(1 for s in y_pred if s == y_true)
-            # print(f'accuracy = {acc} - hits = {hits}')
-            return acc'''
-    pass
+        self.cm = create_confusion_matrix(y_true, y_pred, normalize, plot)
 
 
 class Chromossome():
     '''Chromossome is several genes with different mutations'''
 
-    def __init__(self, df):
-        self.chromossome = df
-        self.fitness = 0
+    def __init__(self, chromosome=[]):
+        self.chromossome = chromosome
+        self.cm = 0
 
-    def calculateFitness(self, dist_aa):
+    def __str__(self, i_max=5):
+        print(f'CHROMOSSOME with {len(self.chromossome)} genes', end=' - ')
+        print(f'Printing only {i_max} genes')
+        i = 1
+        for gene in self.chromossome:
+            if i <= i_max:
+                print(f'{gene}')
+            i += 1
+        if not isinstance(self.cm, int):
+            print(f'Confusion Matrix: \n{self.cm}')
+        return ''
 
-        for gene in range(self.chromossome):
-            f_value = math_func[n]()
+    def _getConfusionMatrix(self):
+        return self.cm
 
-    pass
+    def calculateFitness(self, solution):
+        sol_len = len(solution)
+        chr_len = len(self.chromosome)
+        print(sol_len, chr_len)
+
+    def addGene(self, gene):
+        self.chromossome.append(gene)
+
+    def confusionMatrix(self, normalize=None, plot=False):
+        y_true, y_pred = [], []
+        for gene in self.chromossome:
+            y_true.append(gene._getYTrue())
+            y_pred.append(gene._getYPred())
+
+        self.cm = create_confusion_matrix(y_true, y_pred, normalize, plot)
 
 
 class Population():

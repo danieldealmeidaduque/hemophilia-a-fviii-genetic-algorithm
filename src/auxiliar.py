@@ -24,7 +24,7 @@ int2sev = {
 
 
 def format(value):
-    return round(value, 2)
+    return round(value, 3)
 
 
 def exception_handler(func):

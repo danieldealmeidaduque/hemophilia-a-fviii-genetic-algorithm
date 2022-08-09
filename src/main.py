@@ -26,7 +26,11 @@ if __name__ == '__main__':
 
     for gene_k, gene_v in chromossome:
         g1 = Gene(gene_k, gene_v)
+        g1.calculateFitness(1.5)
+        g1.normalizeFitness()
+        g1.discretizeFitness()
         print(g1)
+        g1.confusionMatrix()
         break
 
 

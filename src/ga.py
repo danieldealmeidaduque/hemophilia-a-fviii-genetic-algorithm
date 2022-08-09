@@ -1,64 +1,54 @@
-import numpy as np
-
-import time
 import pygad
 import numpy as np
-import pandas as pd
-from os.path import abspath, join, dirname
-from sklearn.dummy import DummyClassifier
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, f1_score
+from time import process_time
+from sklearn.metrics import accuracy_score
 
 from math_func import math_func
-from auxiliar import discretize_to_severity, min_max_normalization, sev2int
-from auxiliar import sum_diagonal_cf_matrix
-from auxiliar import exception_handler, math_func_to_string
-from preprocessing import get_initial_df, filter_unique_mutations, read_aa_dm_file, read_pm_file, read_rsa_file
+from auxiliar import discretize_to_severity, min_max_normalization, finished_time, sev2int
+from auxiliar import sum_diagonal_cf_matrix, exception_handler, math_func2string
 
 
-from main import df_unique_mut, df
 # ------------------------ Genetic Algorithm ------------------------------------- #
 
 
 @ exception_handler
-def get_initial_pop(data, size):
+def get_initial_pop(df, size):
     '''get initial population for the ga'''
-    return [np.array(data.dist_aa.values)] * size
+    initial_pop = [np.array(df.dist_aa.values)] * size
+
+    print(f'\nsize: ind, pop = {len(initial_pop[0])}, {len(initial_pop)}\n')
+    return initial_pop
 
 
 @ exception_handler
-def get_x_and_y(data):
-    '''get x and y for prediction'''
-    X = np.array(data.rsa.values)
-    # Y = np.array([sev_to_int[i] for i in list(data.severity.values)])
-    Y = data.sev.values
-    return X, Y
+def get_X(df):
+    '''get X for the ga'''
+    X = df.dist_aa.values
 
-
-# random state to reproduce sklearn classifiers
-RANDOM_STATE = 42
-# number of generations
-NUM_GENERATIONS = 50
-# math function number
-N_MATH_FUNCTION = 4  # 4 is x*s
-
-Y_TRUE_TOTAL = np.array([sev2int[i] for i in list(df.severity.values)])
-X, Y_TRUE_UNIQUE = get_x_and_y(df_unique_mut)
-# print(f'\nX = {X[:5]}')
-# print(f'y = {Y_TRUE[:5]} len:{len(Y_TRUE)}')
-
-INITIAL_POP = get_initial_pop(df_unique_mut, 50)
-# print(f'first element of initial pop = {INITIAL_POP[:1][:5]}')
-# print(f'pop size = {len(INITIAL_POP)}')
+    print(f'\nX = {X[:5]} len:{len(X)}')
+    return X
 
 
 @ exception_handler
-def ga(n=4, plot=False):
+def get_Y_true(df):
+    '''get Y true for the ga'''
+    y_true = np.array([sev2int[i] for i in list(df.severity.values)])
+
+    print(f'y = {y_true[:5]} len:{len(y_true)}\n')
+    return y_true
+
+
+# @ exception_handler
+
+
+def hemaGA(df, initial_pop, num_gens, n, plot=False):
+    ga_start_time = process_time()
     '''function to execute the genetic algorithm'''
-
+    # DF IS DF_UNIQUE_MUT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     def chromosome_fitness(solution):
         '''function to calculate chromossome fitness'''
         # originally is equal to this >> dist_aa = row.dist_aa
-        df_unique_mut['solution'] = solution
+        df['solution'] = solution
 
         def gene_fitness(row):
             '''function to calculate gene fitness'''
@@ -103,8 +93,8 @@ def ga(n=4, plot=False):
             solution_fitness = sum_diagonal_cf_matrix(cf_matrix)
             return solution_fitness
 
-        df_unique_mut['fitness'] = df_unique_mut.apply(gene_fitness, axis=1)
-        gene_fitness_vector = df_unique_mut['fitness'].values
+        df['fitness'] = df.apply(gene_fitness, axis=1)
+        gene_fitness_vector = df['fitness'].values
 
         return gene_fitness_vector
 
@@ -148,12 +138,12 @@ def ga(n=4, plot=False):
         # parameters
         fitness_function = fitness_func
 
-        num_generations = NUM_GENERATIONS
+        num_generations = num_gens
         # number of solutions to be selected as parents
         num_parents_mating = 5
 
         # sol_per_pop and num_genes are None when given initial population
-        initial_population = INITIAL_POP
+        initial_population = initial_pop
         # number of solutions (i.e. chromossomes) within the population
         # sol_per_pop = 50  # 50 fica legal!
         # num_genes = len(X)  # NUM_GENES
@@ -201,6 +191,8 @@ def ga(n=4, plot=False):
     # plot fitness function per generation
     ga_instance.plot_fitness()
 
+    finished_time(ga_start_time, 'GA ALGORITHM')
+
     return solution, solution_idx, solution_fitness
 
     # # ga prediction using best solution
@@ -229,34 +221,36 @@ def ga(n=4, plot=False):
     # return best_y_pred, solution, solution_fitness
 
 
-@ exception_handler
-def get_number_best_math_function(plot=False):
-    '''function to get n of the math function used in the ga'''
-    def loop_ga():
-        '''execute ga with every math function defined initially'''
-        dict_solutions = {}
-        for n in range(len(math_func)):
-            # convert math func to string
-            str_func = math_func_to_string(math_func[n])
-            # execute ga with determined math func
-            _, solution, solution_fitness = ga(n, plot)
-            # keep best solution information as dict
-            dict_solutions[n] = {
-                'math_func': str_func,
-                'best_solution': solution,
-                'best_solution_fitness': solution_fitness
-            }
+# @ exception_handler
+# def n_best_math_func(plot=False):
+#     '''function to get n of the math function used in the ga'''
+#     def loop_ga():
+#         '''execute ga with every math function defined initially'''
+#         dict_solutions = {}
+#         for n in range(len(math_func)):
+#             # convert math func to string
+#             str_func = math_func_to_string(math_func[n])
+#             # execute ga with determined math func
+#             _, solution, solution_fitness = hemaGA(n, plot)
+#             # keep best solution information as dict
+#             dict_solutions[n] = {
+#                 'math_func': str_func,
+#                 'best_solution': solution,
+#                 'best_solution_fitness': solution_fitness
+#             }
 
-        df_solutions = pd.DataFrame(dict_solutions).T
-        return df_solutions
+#         df_solutions = pd.DataFrame(dict_solutions).T
+#         return df_solutions
 
-    # execute ga using multiple math functions
-    df_sol = loop_ga()
-    # sort by solution fitness
-    df_sol.sort_values('best_solution_fitness', ascending=False, inplace=True)
-    print(df_sol)
-    # best math function
-    math_function = df_sol.math_func.iloc[0]
-    n = df_sol.index[0]
+#     # execute ga using multiple math functions
+#     df_sol = loop_ga()
+#     # sort by solution fitness
+#     df_sol.sort_values('best_solution_fitness', ascending=False, inplace=True)
+#     print(df_sol)
+#     # best math function
+#     math_function = df_sol.math_func.iloc[0]
+#     n = df_sol.index[0]
 
-    return math_function, n
+#     print(
+#         f'\n{math_function} - function number {n} in dictionary of mathematical functions')
+#     return n

@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import confusion_matrix
-
-from auxiliar import sum_diagonal_cf_matrix, plot_cf_matrix
-from auxiliar import exception_handler, print_highlighted
-from auxiliar import math_func
-
 import seaborn as sns
 from matplotlib import pyplot as plt
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import confusion_matrix
+
+from auxiliar import scores, sum_diagonal_cf_matrix, plot_cf_matrix
+from auxiliar import exception_handler, highlight
+from math_func import math_func
+
 
 # ------------------------ Fitness testing functions ----------------------------- #
 
@@ -98,7 +99,7 @@ def testing_fitness_functions_without_ga(df):
 
     # calculate fitness value for each mutation
     insert_fitness_value(df_test, math_func[10])
-    print_highlighted('Dataframe with fitness values')
+    highlight('Dataframe with fitness values')
     print(df_test)
 
     # find best population fitness_value, lower bound and upper bound
@@ -109,14 +110,14 @@ def testing_fitness_functions_without_ga(df):
 
     # using best bounds to write fitness as severity
     insert_severity_based_on_fitness_value(df_test, lb, ub)
-    print_highlighted('Dataframe with fitness as severity')
+    highlight('Dataframe with fitness as severity')
     print(df_test)
 
     # create confusion matrix
     y_true = df_test.severity
     y_pred = df_test.predicted_severity
     cf_matrix = confusion_matrix(y_true, y_pred, normalize='true')
-    print_highlighted('Plotting confusion matrix')
+    highlight('Plotting confusion matrix')
     plot_cf_matrix(cf_matrix)
 
     # using confusion matrix to calculate population fitness
@@ -183,3 +184,75 @@ def plots_to_get_insights(df):
     # sns.histplot(ax=ax2, data=df, x='fitness', hue='severity_fitness')
     # ax2.set_title('Predict Severity')
     # plt.show()
+
+
+@ exception_handler
+def dummy_clf_scores(X, y):
+    '''function to generate scores using dummy classifiers'''
+    strategies = ['most_frequent', 'prior', 'stratified', 'uniform']
+    dict_scores = {}
+
+    for s in strategies:
+        # make the prediction
+        dummy_clf = DummyClassifier(strategy=s, random_state=42)
+        dummy_clf.fit(X, y)
+        y_pred = dummy_clf.predict(X)
+
+        # score of the prediction
+        dummy_score = scores(y_true=y, y_pred=y_pred)
+        dict_scores[s] = dummy_score
+
+    return dict_scores
+
+# # ------------------------ Input Diretory and Files ------------------------------ #
+
+# # diretory
+# input_dir = abspath(join(dirname(__file__), '..', 'datasets'))
+
+# # input file - point mutations (pm)
+# pm_file = 'FVIII_point_mutations_v1.csv'
+# pm_path = join(input_dir, pm_file)
+
+# # input file - amino acids distance matrix (dm)
+# dm_file = 'Supplementary_Table_npj_paper.xlsx'
+# dm_path = join(input_dir, dm_file)
+
+# # input file - relative surface area (rsa)
+# rsa_file = 'Relative_Surf_Area_2R7E_v2.csv'
+# rsa_path = join(input_dir, rsa_file)
+
+# # dataframe with all informations
+# df = get_initial_df(pm_path, dm_path, rsa_path)
+# print(f'\n{df}')
+
+# # dataframe filtered to use in ga
+# df_unique_mut = filter_unique_mutations(df)
+# print(f'df_filtered:\n\n{df_unique_mut}')
+
+# # ------------------ Recreating Distance Matrix with GA solution ---
+
+# # ga solution to distance matrix
+# df_unique_mut['dist_aa'] = solution
+#  # index and column names
+#  aa_list = np.unique(df_unique_mut['wild_aa'].values.tolist())
+#   # empty distance matrix labeled
+#   dm = pd.DataFrame(index=aa_list, columns=aa_list)
+
+#    # function to insert an amino acid distance in distance matrix
+#    def insert_aa_in_dm(row):
+#         dm.at[row.wild_aa, row.new_aa] = round(row.dist_aa, 2)
+
+#     df_unique_mut.apply(insert_aa_in_dm, axis=1)
+
+#     print(df.describe())
+#     print(df_unique_mut.describe())
+#     print(dm)
+
+#     # # ------------------ Other Classifiers and Scores ------------------
+#     # dict_scores = {}
+#     # dict_scores = dummy_clf_scores(X=X, y=y_true)
+#     # dict_scores['ga'] = scores(y_true=y_true, y_pred=y_pred)
+
+#     # df_scores = pd.DataFrame(dict_scores).T
+#     # df_scores.sort_values(by='macro_f1_score', ascending=False, inplace=True)
+#     # print(df_scores)

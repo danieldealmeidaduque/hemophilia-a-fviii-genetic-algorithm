@@ -1,81 +1,38 @@
-# -*- coding: utf-8 -*-
-
-import time
-import numpy as np
-import pandas as pd
 from os.path import abspath, join, dirname
 
-from ga import ga, get_number_best_math_function
-from preprocessing import get_initial_df, filter_unique_mutations
-from auxiliar import scores, confusion_matrix, plot_cf_matrix, print_finished_time, dummy_clf_scores
-
-# ------------------------ Input Diretory and Files ------------------------------ #
-
-# diretory
-input_dir = abspath(join(dirname(__file__), '..', 'datasets'))
-
-# input file - point mutations (pm)
-pm_file = 'FVIII_point_mutations_v1.csv'
-pm_path = join(input_dir, pm_file)
-
-# input file - amino acids distance matrix (aa_dm)
-aa_dm_file = 'Supplementary_Table_npj_paper.xlsx'
-aa_dm_path = join(input_dir, aa_dm_file)
-
-# input file - relative surface area (rsa)
-rsa_file = 'Relative_Surf_Area_2R7E_v2.csv'
-rsa_path = join(input_dir, rsa_file)
-
-# dataframe with all informations
-df = get_initial_df(aa_dm_path, rsa_path, pm_path)
-print(f'\n{df}')
-
-# dataframe filtered to use in ga
-df_unique_mut = filter_unique_mutations(df)
-print(f'df_filtered:\n\n{df_unique_mut}')
-
+from preprocessing import initial_df, filter_df_for_ga
+from ga import hemaGA, get_initial_pop, get_X, get_Y_true
 
 if __name__ == '__main__':
-    # ------------------ Genetic Algorithm -----------------------------
-    ga_start_time = time.time()
+    '''Get initial data and execute genetic algorithm'''
 
-    # execute ga with several math functions to find the best one
-    s, n = get_number_best_math_function(plot=False)
-    print(f'\n{s} - function number {n} in dictionary of mathematical functions')
+    input_dir = abspath(join(dirname(__file__), '..', 'datasets'))
 
-    # execute ga with an especific math function
-    solution, solution_idx, solution_fitness = ga(n=4, plot=False)
+    input_pm_file = 'FVIII_point_mutations_v1.csv'
+    input_pm_path = join(input_dir, input_pm_file)
 
-    # create confusion_matrix and normalize = true uses row to normalize
-    # best_cf_matrix = confusion_matrix(y_true, solution, normalize='true') # y_true??
-    # plot_cf_matrix(best_cf_matrix)
+    input_dm_file = 'Supplementary_Table_npj_paper.xlsx'
+    input_dm_path = join(input_dir, input_dm_file)
 
-    print_finished_time(ga_start_time, 'GA ALGORITHM')
+    input_rsa_file = 'Relative_Surf_Area_2R7E_v2.csv'
+    input_rsa_path = join(input_dir, input_rsa_file)
 
-    # ------------------ Recreating Distance Matrix with GA solution ---
+    df = initial_df(input_pm_path, input_dm_path, input_rsa_path)
 
-    # ga solution to distance matrix
-    df_unique_mut['dist_aa'] = solution
-    # index and column names
-    aa_list = np.unique(df_unique_mut['wild_aa'].values.tolist())
-    # empty distance matrix labeled
-    dm = pd.DataFrame(index=aa_list, columns=aa_list)
+    df_ga = filter_df_for_ga(df)
 
-    # function to insert an amino acid distance in distance matrix
-    def insert_aa_in_dm(row):
-        dm.at[row.wild_aa, row.new_aa] = round(row.dist_aa, 2)
+    # ''' Genetic Algorithm'''
+    POP_SIZE = 50
+    NUM_GENS = 10
+    N_MATH_FUNC = 4
 
-    df_unique_mut.apply(insert_aa_in_dm, axis=1)
+    initial_pop = get_initial_pop(df_ga, POP_SIZE)
+    y_true = get_Y_true(df_ga)
+    X = get_X(df_ga)
 
-    print(df.describe())
-    print(df_unique_mut.describe())
-    print(dm)
+    # n = n_best_math_func(plot=False)
+    solution, solution_idx, solution_fitness = hemaGA(
+        df_ga, initial_pop, num_gens=NUM_GENS, n=N_MATH_FUNC, plot=False)
 
-    # # ------------------ Other Classifiers and Scores ------------------
-    # dict_scores = {}
-    # dict_scores = dummy_clf_scores(X=X, y=y_true)
-    # dict_scores['ga'] = scores(y_true=y_true, y_pred=y_pred)
-
-    # df_scores = pd.DataFrame(dict_scores).T
-    # df_scores.sort_values(by='macro_f1_score', ascending=False, inplace=True)
-    # print(df_scores)
+    # cf_matrix = confusion_matrix(y_true, solution, normalize='true')
+    # plot_cf_matrix(cf_matrix)

@@ -1,10 +1,9 @@
 import re
 import sys
-import time
 import inspect
 import seaborn as sns
+from time import process_time
 from matplotlib import pyplot as plt
-from sklearn.dummy import DummyClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, f1_score
 
@@ -23,6 +22,10 @@ int2sev = {
 # ------------------------ Auxiliar Functions ------------------------------------ #
 
 
+def format(value):
+    return round(value, 2)
+
+
 def exception_handler(func):
     '''cleaner way to handle exceptions and exit the program'''
     def inner_function(*args, **kwargs):
@@ -36,22 +39,22 @@ def exception_handler(func):
 
 
 @ exception_handler
-def print_finished_time(start_time, finish_msg):
+def finished_time(start_time, finish_msg):
     '''print finished time formatted'''
-    f_time = time.time()
-    e_time = round((f_time - start_time), 2)
+    f_time = process_time()
+    e_time = format((f_time - start_time))
     msg = f'\n\t{finish_msg} - Finished  in {e_time} s.\n'
     print(msg)
 
 
 @ exception_handler
-def print_highlighted(s):
+def highlight(s):
     '''print upper and lower highlighted text'''
     print('\n\t\t\t ----------- ' + s.upper() + ' ------------\n')
 
 
 @ exception_handler
-def math_func_to_string(func):
+def math_func2string(func):
     '''convert one line of math_func to a string'''
     line = inspect.getsourcelines(func)[0][0]
     str_func = re.search('s:.*', line).group()[3:-1].strip()
@@ -147,9 +150,6 @@ def scores(y_true, y_pred):
     '''function to calculate several scores based on y_true and y_pred'''
     avg = 'macro'
 
-    def format(value):
-        return round(value, 2)
-
     acc = format(accuracy_score(y_true, y_pred))
     b_acc = format(balanced_accuracy_score(y_true, y_pred))
 
@@ -162,24 +162,5 @@ def scores(y_true, y_pred):
         'macro_precision_score': p,
         'macro_f1_score': f1,
     }
-
-    return dict_scores
-
-
-@ exception_handler
-def dummy_clf_scores(X, y):
-    '''function to generate scores using dummy classifiers'''
-    strategies = ['most_frequent', 'prior', 'stratified', 'uniform']
-    dict_scores = {}
-
-    for s in strategies:
-        # make the prediction
-        dummy_clf = DummyClassifier(strategy=s, random_state=42)
-        dummy_clf.fit(X, y)
-        y_pred = dummy_clf.predict(X)
-
-        # score of the prediction
-        dummy_score = scores(y_true=y, y_pred=y_pred)
-        dict_scores[s] = dummy_score
 
     return dict_scores

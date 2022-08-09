@@ -10,7 +10,7 @@ from auxiliar import exception_handler, strip_string, sev2int
 
 
 @ exception_handler
-def read_aa_dm_file(input_path):
+def read_aa_dm_excel(input_path):
     '''read amino acids distance matrix input file to a dataframe'''
     df = pd.read_excel(input_path, index_col=0)
     # remove extra spaces from string values
@@ -29,7 +29,7 @@ def read_aa_dm_file(input_path):
 
 
 @ exception_handler
-def read_rsa_file(input_path, csv_sep='\t'):
+def read_rsa_csv(input_path, csv_sep='\t'):
     '''read and clean the rsa input file to a dataframe'''
     df = pd.read_csv(input_path, sep=csv_sep)
     # remove extra spaces from string values
@@ -49,7 +49,7 @@ def read_rsa_file(input_path, csv_sep='\t'):
 
 
 @ exception_handler
-def read_pm_file(input_path, csv_sep='\t'):
+def read_pm_csv(input_path, csv_sep='\t'):
     '''read and clean the point mutations input file to a dataframe'''
     df = pd.read_csv(input_path, sep=csv_sep)
     # remove extra spaces from string values
@@ -90,7 +90,7 @@ def read_pm_file(input_path, csv_sep='\t'):
 
 
 @ exception_handler
-def insert_dist_aa(df, aa_dm_df):
+def insert_dist_aa(df, df_dm):
     '''function to insert distance between two amino acids in each row of the dataframe'''
     def get_dist_aa(row):
         '''get distance between two amino acids'''
@@ -98,7 +98,7 @@ def insert_dist_aa(df, aa_dm_df):
         new = row.new_aa
 
         if new != '---':
-            return aa_dm_df[wild][new]
+            return df_dm[wild][new]
         else:
             return NaN
 
@@ -106,7 +106,7 @@ def insert_dist_aa(df, aa_dm_df):
 
 
 @ exception_handler
-def insert_rsa(df, rsa_df):
+def insert_rsa(df, df_rsa):
     '''function to insert rsa value based on position in each row of the dataframe'''
     def cross_check_residue_is_wild_aa(row):
         '''get rsa after - cross check if residue in rsa is the correct wild amino acid'''
@@ -114,9 +114,9 @@ def insert_rsa(df, rsa_df):
         wild = row.wild_aa
 
         # check if point mutation position is in the rsa matrix
-        if pos in rsa_df.index:
-            residue = rsa_df.loc[pos].residue
-            rsa = rsa_df.loc[pos].rsa
+        if pos in df_rsa.index:
+            residue = df_rsa.loc[pos].residue
+            rsa = df_rsa.loc[pos].rsa
 
             # check if residue in rsa matrix is equal to the wild amino acid in the dataframe
             is_same_aa = wild == residue
@@ -134,42 +134,37 @@ def insert_rsa(df, rsa_df):
 
 
 @ exception_handler
-def get_initial_df(aa_dm_path, rsa_path, pm_path):
+def initial_df(pm_path, dm_path, rsa_path):
     '''function to read all files and put all informations in a singles dataframe'''
+    df_pm = read_pm_csv(pm_path, csv_sep='\t')
+    df = df_pm.copy()
 
-    df_input_pm = read_pm_file(pm_path, csv_sep='\t')
-    # print_highlighted('Input: Point mutations')
-    # print(df_input_pm)
+    df_dm = read_aa_dm_excel(dm_path)
+    insert_dist_aa(df, df_dm)
 
-    df_input_aa_dm = read_aa_dm_file(aa_dm_path)
-    insert_dist_aa(df_input_pm, df_input_aa_dm)
-    # print_highlighted('Input: Amino acids distance matrix')
-    # print(df_input_aa_dm)
+    df_rsa = read_rsa_csv(rsa_path, csv_sep='\t')
+    insert_rsa(df, df_rsa)
 
-    df_input_rsa = read_rsa_file(rsa_path, csv_sep='\t')
-    insert_rsa(df_input_pm, df_input_rsa)
-    # print_highlighted('Input: Relative surface area')
-    # print(df_input_rsa)
+    df.dropna(inplace=True)
+    df.sort_values(by='position_hgvs', inplace=True)
 
-    df_input_pm.dropna(inplace=True)
-    # print_highlighted('Dataframe without NaN values')
-    # print(df_input_pm)
-
-    df_input_pm.sort_values(by='position_hgvs', inplace=True)
-
-    return df_input_pm
+    print('\n\tOriginal Dataframe\n')
+    print(df.info())  # or df
+    return df
 
 # ------------------------ GA Auxiliar ------------------------------------------- #
 
 
 @ exception_handler
-def filter_unique_mutations(df):
+def filter_df_for_ga(df):
     '''function filter the dataframe based on same mutations'''
-
     df_aux = df.copy()
-    df_aux['sev'] = df_aux['severity'].apply(lambda s: sev2int[s])
 
-    df_aux = df_aux[df_aux['effect'] == 'Missense']
+    df_aux['sev'] = df_aux['severity'].apply(lambda s: sev2int[s])
+    # print(df_aux.shape)
+
+    # df_aux = df_aux[df_aux['effect'] == 'Missense']
+    # print(df_aux.shape)
 
     df_grouped = df_aux.groupby(['wild_aa', 'new_aa'])
 
@@ -188,5 +183,6 @@ def filter_unique_mutations(df):
 
     df_aux.drop_duplicates(subset=['wild_aa', 'new_aa'], inplace=True)
 
-    print(df_aux)
+    print('\n\tGA Dataframe\n')
+    print(df_aux.info())  # or df_aux
     return df_aux

@@ -1,31 +1,10 @@
 import re
 import sys
 import inspect
-import numpy as np
-import seaborn as sns
 from time import process_time
-from matplotlib import pyplot as plt
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, f1_score
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-
-sev2int = {
-    'Mild': 0,
-    'Moderate': 1,
-    'Severe': 2
-}
-
-int2sev = {
-    0: 'Mild',
-    1: 'Moderate',
-    2: 'Severe'
-}
 
 # ------------------------ Auxiliar Functions ------------------------------------ #
-
-
-def format(value):
-    return round(value, 3)
 
 
 def exception_handler(func):
@@ -41,18 +20,31 @@ def exception_handler(func):
 
 
 @ exception_handler
-def finished_time(start_time, finish_msg):
-    '''print finished time formatted'''
-    f_time = process_time()
-    e_time = format((f_time - start_time))
-    msg = f'\n\t{finish_msg} - Finished  in {e_time} s.\n'
-    print(msg)
+def format(value):
+    return round(value, 3)
 
 
 @ exception_handler
 def highlight(s):
     '''print upper and lower highlighted text'''
     print('\n\t\t\t ----------- ' + s.upper() + ' ------------\n')
+
+
+@ exception_handler
+def strip_string(s):
+    try:
+        s = s.strip()
+    finally:
+        return s
+
+
+@ exception_handler
+def finished_time(start_time, finish_msg):
+    '''print finished time formatted'''
+    f_time = process_time()
+    e_time = format((f_time - start_time))
+    msg = f'\n\t{finish_msg} - Finished  in {e_time} s.\n'
+    print(msg)
 
 
 @ exception_handler
@@ -64,101 +56,14 @@ def math_func2string(func):
     return str_func
 
 
-def strip_string(s):
-    try:
-        s = s.strip()
-    finally:
-        return s
-
-# ------------------------ Confusion Matrix Functions ---------------------------- #
-
-
-@ exception_handler
-def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
-    labels = ['Mild', 'Moderate', 'Severe']
-
-    cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
-
-    if plot:
-        disp = ConfusionMatrixDisplay(cm, labels)
-        disp.plot()
-        plt.title('Confusion Matrix normalized by row')
-        plt.show()
-
-    return cm
-
-
-@ exception_handler
-def sum_diagonal_cf_matrix(cf_matrix):
-    '''sum of principal diagonal of the confusion matrix'''
-    n = len(cf_matrix)
-    m = len(cf_matrix[0])
-
-    sum_corrects = 0
-    for i in range(n):
-        for j in range(m):
-            if i == j:
-                correct = cf_matrix[i][j].sum()
-                sum_corrects += correct
-
-    return sum_corrects
-
-
-@ exception_handler
-def plot_cf_matrix(cf_matrix, save=False):
-    '''plot confusion matrix as heatmap'''
-    fig, ax = plt.subplots(figsize=(8, 8))
-
-    ax = sns.heatmap(cf_matrix, annot=True, cmap='Blues')
-
-    ax.set_title('Seaborn Confusion Matrix')
-    ax.set_xlabel('Predicted Hemophilia Severity')
-    ax.set_ylabel('Actual Hemophilia Severity')
-
-    # labels - list must be in alphabetical order
-    ax.xaxis.set_ticklabels(['Mild', 'Mod', 'Sev'])
-    ax.yaxis.set_ticklabels(['Mild', 'Mod', 'Sev'])
-
-    if save:
-        plt.savefig('cf_matrix.png')
-    else:
-        plt.show()
-
-# ------------------------ Normalization and Discretization ---------------------- #
-
-
-def min_max_normalization(V):
-    '''normalize vector using min-max normalization'''
-    min_v = min(V)
-    max_v = max(V)
-    if max_v - min_v != 0:
-        for i, v in enumerate(V):
-            V[i] = (v - min_v) / (max_v - min_v)
-    return V
-
-
-@ exception_handler
-def discretize_to_severity(vector, lb=0.33, ub=0.66):  # 0.44 and 0.55?
-    '''function to discretize a 1D array to severity (0, 1, 2)'''
-    def cut(v):
-        '''function to cut using lower and upper bounds'''
-        if v >= 0 and v <= lb:
-            return 0  # 'Mild'
-        elif v > lb and v <= ub:
-            return 1  # 'Moderate'
-        else:
-            return 2  # 'Severe'
-
-    S = [cut(v) for v in vector]
-
-    return S
-
 # ----------------------------- Prediction Scores -------------------------------- #
 
 
-@ exception_handler
+# @ exception_handler
 def scores(y_true, y_pred):
     '''function to calculate several scores based on y_true and y_pred'''
+    # print(y_true, y_pred)
+
     avg = 'macro'
 
     acc = format(accuracy_score(y_true, y_pred))
@@ -175,32 +80,3 @@ def scores(y_true, y_pred):
     }
 
     return dict_scores
-
-# -- GA --
-
-
-@ exception_handler
-def get_initial_pop(df, size):
-    '''get initial population for the ga'''
-    initial_pop = [np.array(df.dist_aa.values)] * size
-
-    print(f'\nsize: ind, pop = {len(initial_pop[0])}, {len(initial_pop)}\n')
-    return initial_pop
-
-
-@ exception_handler
-def get_X(df):
-    '''get X for the ga'''
-    X = df.dist_aa.values
-
-    print(f'\nX = {X[:5]} len:{len(X)}')
-    return X
-
-
-@ exception_handler
-def get_Y_true(df):
-    '''get Y true for the ga'''
-    y_true = np.array([sev2int[i] for i in list(df.severity.values)])
-
-    print(f'y = {y_true[:5]} len:{len(y_true)}\n')
-    return y_true

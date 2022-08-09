@@ -3,7 +3,7 @@ import pandas as pd
 from numpy import NaN
 from Bio.Data.IUPACData import protein_letters_1to3_extended as prot1to3
 
-from auxiliar import exception_handler, strip_string, sev2int
+from auxiliar import exception_handler, strip_string
 
 
 # ------------------------ Read Input Files -------------------------------------- #
@@ -151,38 +151,3 @@ def initial_df(pm_path, dm_path, rsa_path):
     # print('\n\tOriginal Dataframe\n')
     # print(df.info())  # or df
     return df
-
-# ------------------------ GA Auxiliar ------------------------------------------- #
-
-
-@ exception_handler
-def filter_df_for_ga(df):
-    '''function filter the dataframe based on same mutations'''
-    df_aux = df.copy()
-
-    df_aux['sev'] = df_aux['severity'].apply(lambda s: sev2int[s])
-    # print(df_aux.shape)
-
-    # df_aux = df_aux[df_aux['effect'] == 'Missense']
-    # print(df_aux.shape)
-
-    df_grouped = df_aux.groupby(['wild_aa', 'new_aa'])
-
-    g_pos = df_grouped['position_hgvs'].apply(lambda x: list(x.values))
-    g_rsa = df_grouped['rsa'].apply(lambda x: list(x.values))
-    g_sev = df_grouped['sev'].apply(lambda x: list(x.values))
-
-    df_aux['position_hgvs'] = df_aux.apply(
-        lambda r: g_pos[r.wild_aa][r.new_aa], axis=1)
-
-    df_aux['rsa'] = df_aux.apply(
-        lambda r: g_rsa[r.wild_aa][r.new_aa], axis=1)
-
-    df_aux['sev'] = df_aux.apply(
-        lambda r: g_sev[r.wild_aa][r.new_aa], axis=1)
-
-    df_aux.drop_duplicates(subset=['wild_aa', 'new_aa'], inplace=True)
-
-    # print('\n\tGA Dataframe\n')
-    # print(df_aux.info())  # or df_aux
-    return df_aux

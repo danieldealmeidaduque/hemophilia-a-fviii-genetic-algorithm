@@ -8,39 +8,6 @@ from auxiliar import discretize_to_severity, min_max_normalization, finished_tim
 from auxiliar import sum_diagonal_cf_matrix, exception_handler, math_func2string
 
 
-# ------------------------ Genetic Algorithm ------------------------------------- #
-
-
-@ exception_handler
-def get_initial_pop(df, size):
-    '''get initial population for the ga'''
-    initial_pop = [np.array(df.dist_aa.values)] * size
-
-    print(f'\nsize: ind, pop = {len(initial_pop[0])}, {len(initial_pop)}\n')
-    return initial_pop
-
-
-@ exception_handler
-def get_X(df):
-    '''get X for the ga'''
-    X = df.dist_aa.values
-
-    print(f'\nX = {X[:5]} len:{len(X)}')
-    return X
-
-
-@ exception_handler
-def get_Y_true(df):
-    '''get Y true for the ga'''
-    y_true = np.array([sev2int[i] for i in list(df.severity.values)])
-
-    print(f'y = {y_true[:5]} len:{len(y_true)}\n')
-    return y_true
-
-
-# @ exception_handler
-
-
 def hemaGA(df, initial_pop, num_gens, n, plot=False):
     ga_start_time = process_time()
     '''function to execute the genetic algorithm'''

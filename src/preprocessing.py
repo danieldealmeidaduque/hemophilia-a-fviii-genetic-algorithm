@@ -148,8 +148,8 @@ def initial_df(pm_path, dm_path, rsa_path):
     df.dropna(inplace=True)
     df.sort_values(by='position_hgvs', inplace=True)
 
-    print('\n\tOriginal Dataframe\n')
-    print(df.info())  # or df
+    # print('\n\tOriginal Dataframe\n')
+    # print(df.info())  # or df
     return df
 
 # ------------------------ GA Auxiliar ------------------------------------------- #
@@ -183,6 +183,6 @@ def filter_df_for_ga(df):
 
     df_aux.drop_duplicates(subset=['wild_aa', 'new_aa'], inplace=True)
 
-    print('\n\tGA Dataframe\n')
-    print(df_aux.info())  # or df_aux
+    # print('\n\tGA Dataframe\n')
+    # print(df_aux.info())  # or df_aux
     return df_aux

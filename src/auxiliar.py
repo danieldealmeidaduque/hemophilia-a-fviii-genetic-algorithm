@@ -2,6 +2,7 @@ import re
 import sys
 import inspect
 from time import process_time
+from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, f1_score
 

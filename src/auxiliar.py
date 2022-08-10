@@ -2,7 +2,9 @@ import re
 import sys
 import inspect
 from time import process_time
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, f1_score
+
 
 # ------------------------ Auxiliar Functions ------------------------------------ #
 
@@ -80,3 +82,19 @@ def scores(y_true, y_pred):
     }
 
     return dict_scores
+
+# ----------------------------- Confusion Matrix --------------------------------- #
+
+
+@ exception_handler
+def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
+    labels = ['Mild', 'Moderate', 'Severe']
+    cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
+
+    if plot:
+        disp = ConfusionMatrixDisplay(cm, display_labels=labels)
+        disp.plot()
+        plt.title('Confusion Matrix normalized by row')
+        plt.show()
+
+    return cm

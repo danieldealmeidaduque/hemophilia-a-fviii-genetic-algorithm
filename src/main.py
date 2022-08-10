@@ -2,17 +2,16 @@ import pygad
 from time import process_time
 from matplotlib import pyplot as plt
 from os.path import abspath, join, dirname
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from preprocessing import initial_df
 from hemaGA import Gene, Chromossome
-from auxiliar import finished_time, exception_handler
+from auxiliar import finished_time, exception_handler, create_confusion_matrix
 
 # ---- GA CONSTANTS ----
 # 50 generations + 50 sol per pop = 5 min de execucao
 
 # number of generations
-NUM_GENERATIONS = 10  # 50
+NUM_GENERATIONS = 50  # 50
 # number of solutions to be selected as parents
 NUM_PARENTS_MATING = 5  # 5
 # number of solutions (chromossomes)
@@ -29,49 +28,36 @@ CROSSOVER_PROBABILITY = 0.9
 MUTATION_TYPE = 'random'  # random
 # percentage of genes to mutate
 MUTATION_PERCENT_GENES = 10  # 10
+# gene limit values
+GENE_SPACE = {'low': 0, 'high': 10}
 
 
-@ exception_handler
-def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
-    labels = ['Mild', 'Moderate', 'Severe']
-    cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
-
-    if plot:
-        disp = ConfusionMatrixDisplay(cm, display_labels=labels)
-        disp.plot()
-        plt.title('Confusion Matrix normalized by row')
-        plt.show()
-
-    return cm
-
-
-@ exception_handler
+# @ exception_handler
 def ga(chromossome):
     '''function to execute the genetic algorithm'''
+    print('Initiating GA...')
     ga_start_time = process_time()
 
     def fitness_func(solution, solution_idx):
         '''pygad fitness function to give as a parameter'''
         chromossome.chromossomePredict(solution)
-        merged_df = chromossome.mergeGenesDataframes()
-        y_true = merged_df['severity'].values
-        y_pred = merged_df['fitness_discretized'].values
+        chromossome._setConfusionMatrix()
+        chromossome._setFitness()
+        chromossome._setSolution(solution)
 
-        cm = create_confusion_matrix(
-            y_true, y_pred, normalize='all', plot=False)
-        solution_fitness = cm[0][0] + cm[1][1] + cm[2][2]
-
-        # print(f'{solution_fitness}', end=' - ')
+        solution_fitness = chromossome._getFitness()
         return solution_fitness
 
     def prepare_ga():
         '''function to prepare ga parameters'''
+        print('Preparing GA...')
         num_genes = len(chromossome._getGenes())
         fitness_function = fitness_func
 
         def on_generation(ga_instance):
-            print(chromossome.mergeGenesDataframes())
-            print(f'\nNEW GENERATION')
+            fit = chromossome._getFitness()
+            s = chromossome._getSolution()
+            print(f'\n GENERATION - Fitness: {format(fit)} - \n{s}')
 
         ga_instance = pygad.GA(num_generations=NUM_GENERATIONS,
                                num_parents_mating=NUM_PARENTS_MATING,
@@ -84,7 +70,9 @@ def ga(chromossome):
                                crossover_probability=CROSSOVER_PROBABILITY,
                                on_generation=on_generation,
                                mutation_type=MUTATION_TYPE,
-                               mutation_percent_genes=MUTATION_PERCENT_GENES)
+                               mutation_percent_genes=MUTATION_PERCENT_GENES,
+                               #    gene_space=GENE_SPACE # fitness ficou fixo..
+                               )
 
         return ga_instance
 
@@ -118,7 +106,7 @@ if __name__ == '__main__':
     df = initial_df(input_pm_path, input_dm_path, input_rsa_path)
 
     # ---- GENETIC ALGORITHM ----
-    print('\n\n')
+    print()
 
     df_grouped = df.groupby(['wild_aa', 'new_aa'])  # is the chromossome
     genes = [Gene(k, v) for k, v in df_grouped]  # all genes

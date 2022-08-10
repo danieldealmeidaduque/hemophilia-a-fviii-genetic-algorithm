@@ -1,5 +1,6 @@
 import pandas as pd
 from math_func import math_func
+from auxiliar import create_confusion_matrix
 
 N_MATH = 4  # dist * rsa
 
@@ -14,7 +15,7 @@ class Gene():
 
     def __str__(self, show_df=False):
         print(f'\tGENE = {self.wild_aa} -> {self.new_aa}', end=' | ')
-        print(f'fit = {self.fitness_mean} | {len(self.df)} mutations', end='')
+        print(f'{len(self.df)} mutations | fit = {self.fitness_mean}', end='')
         # print(f'\n\n{self.df}')
         return ''
 
@@ -51,7 +52,7 @@ class Gene():
 
         self.df['fitness_normalized'] = fitness_normalized
 
-    def discretizeFitness(self, lb=0.33, ub=0.66):
+    def discretizeFitness(self, lb=0.44, ub=0.55):
         def discretize(value):
             if value >= 0 and value < lb:
                 return 'Mild'  # 0
@@ -77,33 +78,38 @@ class Chromossome(Gene):
 
     def __init__(self, genes=[]):
         self.genes = genes
-        self.fitness = 0
         self.cm = 0
+        self.fitness = 0
+        self.solution = []
 
     def __str__(self):
-        i_max = 2
-        i = 1
-        print(f'CHROMOSSOME with {len(self.genes)} genes', end=' - ')
-        print(f'Printing only {i_max} genes\n')
-        for gene in self.genes:
-            if i <= i_max:
-                print(f'{gene}')
-            i += 1
-        if not isinstance(self.cm, int):
-            print(f'\nConfusion Matrix: \n{self.cm}')
-        return ''
-
-    def _getFitness(self):
-        return self.fitness_mean
-
-    def _setFitness(self):
-        self.fitness = self.df['fitness'].mean()
+        return f'CHROMOSSOME has {len(self.genes)} genes'
 
     def _getGenes(self):
         return self.genes
 
+    def _getSolution(self):
+        return self.solution
+
+    def _setSolution(self, solution):
+        self.solution = solution
+
+    def _getFitness(self):
+        return self.fitness
+
+    def _setFitness(self):
+        self.fitness = self.cm[0][0] + self.cm[1][1] + self.cm[2][2]
+
     def _getConfusionMatrix(self):
         return self.cm
+
+    def _setConfusionMatrix(self):
+        merged_df = self.mergeGenesDataframes()
+        y_true = merged_df['severity'].values
+        y_pred = merged_df['fitness_discretized'].values
+
+        self.cm = create_confusion_matrix(
+            y_true, y_pred, normalize='all', plot=False)
 
     def chromossomePredict(self, solution):
         chr_size = len(self.genes)
@@ -124,13 +130,3 @@ class Chromossome(Gene):
             df = pd.concat([df, gene_df])
 
         return df
-
-
-class Population():
-    def __init__(self, size=None):
-        pass
-
-
-class HemaGA():
-    def __init__(self, df=None, initial_pop=None, n_generations=None, n_math=None):
-        pass

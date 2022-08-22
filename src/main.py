@@ -5,10 +5,11 @@ from os.path import abspath, join, dirname
 
 from preprocessing import initial_df
 from hemaGA import Gene, Chromossome
-from auxiliar import finished_time, exception_handler, create_confusion_matrix
+from auxiliar import finished_time, format, exception_handler, create_confusion_matrix, plot_confusion_matrix
 
 # ---- GA CONSTANTS ----
 # 50 generations + 50 sol per pop = 5 min de execucao
+# 50 generations + 100 sol per pop = 15 min de execucao
 
 # number of generations
 NUM_GENERATIONS = 50  # 50
@@ -23,17 +24,17 @@ KEEP_PARENTS = 1  # 1
 # single_point | two_points | uniform | scattered | a custom crossover function
 CROSSOVER_TYPE = 'uniform'  # uniform
 # probability of crossover
-CROSSOVER_PROBABILITY = 0.9
+CROSSOVER_PROBABILITY = 0.9  # 0.9
 # random | swap | inversion | scramble | adaptive | a custom mutation function
 MUTATION_TYPE = 'random'  # random
 # percentage of genes to mutate
 MUTATION_PERCENT_GENES = 10  # 10
 # gene limit values
-GENE_SPACE = {'low': 0, 'high': 10}
+# GENE_SPACE = {'low': 0, 'high': 10}
 
 
 # @ exception_handler
-def ga(chromossome):
+def ga(chromossome, output_path):
     '''function to execute the genetic algorithm'''
     print('Initiating GA...')
     ga_start_time = process_time()
@@ -56,8 +57,8 @@ def ga(chromossome):
 
         def on_generation(ga_instance):
             fit = chromossome._getFitness()
-            s = chromossome._getSolution()
-            print(f'\n GENERATION - Fitness: {format(fit)} - \n{s}')
+            # s = chromossome._getSolution()
+            print(f'\n GENERATION - Fitness: {format(fit)}')
 
         ga_instance = pygad.GA(num_generations=NUM_GENERATIONS,
                                num_parents_mating=NUM_PARENTS_MATING,
@@ -83,7 +84,7 @@ def ga(chromossome):
     # get output parameters
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     # plot fitness function per generation
-    ga_instance.plot_fitness()
+    ga_instance.plot_fitness(save_dir=output_path)
 
     finished_time(ga_start_time, 'GA ALGORITHM')
     return solution, solution_fitness, solution_idx
@@ -105,6 +106,10 @@ if __name__ == '__main__':
 
     df = initial_df(input_pm_path, input_dm_path, input_rsa_path)
 
+    output_dir = abspath(join(dirname(__file__), '..', 'workdir'))
+    output_ga_file = f'ga_{NUM_GENERATIONS}_{NUM_PARENTS_MATING}_{SOL_PER_POP}_{PARENT_SELECTION_TYPE}_{KEEP_PARENTS}_{CROSSOVER_TYPE}_{CROSSOVER_PROBABILITY}_{MUTATION_TYPE}_{MUTATION_PERCENT_GENES}.pdf'
+    output_ga_path = join(output_dir, output_ga_file)
+
     # ---- GENETIC ALGORITHM ----
     print()
 
@@ -112,7 +117,17 @@ if __name__ == '__main__':
     genes = [Gene(k, v) for k, v in df_grouped]  # all genes
     chromossome = Chromossome(genes)  # chromossome class
 
-    solution, solution_fitness, solution_idx = ga(chromossome)
+    solution, solution_fitness, solution_idx = ga(chromossome, output_ga_path)
     print(solution_fitness)
     print(solution_idx)
     print(solution)
+
+    '''pygad fitness function to give as a parameter'''
+    chromossome.chromossomePredict(solution)
+    chromossome._setConfusionMatrix()
+    chromossome._setFitness()
+    chromossome._setSolution(solution)
+
+    cm = chromossome._getConfusionMatrix()
+    output_cm_path = join(output_dir, 'cm')
+    plot_confusion_matrix(cm, output_path=None)

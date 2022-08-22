@@ -87,7 +87,7 @@ def scores(y_true, y_pred):
 # ----------------------------- Confusion Matrix --------------------------------- #
 
 
-@ exception_handler
+# @ exception_handler
 def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
     labels = ['Mild', 'Moderate', 'Severe']
     cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
@@ -99,3 +99,16 @@ def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
         plt.show()
 
     return cm
+
+
+# @ exception_handler
+def plot_confusion_matrix(cm, output_path=None):
+    labels = ['Mild', 'Moderate', 'Severe']
+
+    disp = ConfusionMatrixDisplay(cm, display_labels=labels)
+    disp.plot()
+    plt.title('Confusion Matrix normalized by row')
+    if output_path == None:
+        plt.show()
+    else:
+        plt.savefig(output_path)

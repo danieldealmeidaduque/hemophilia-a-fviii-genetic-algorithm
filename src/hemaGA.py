@@ -103,13 +103,13 @@ class Chromossome(Gene):
     def _getConfusionMatrix(self):
         return self.cm
 
-    def _setConfusionMatrix(self):
+    def _setConfusionMatrix(self, plot=False):
         merged_df = self.mergeGenesDataframes()
         y_true = merged_df['severity'].values
         y_pred = merged_df['fitness_discretized'].values
 
         self.cm = create_confusion_matrix(
-            y_true, y_pred, normalize='all', plot=False)
+            y_true, y_pred, normalize='true', plot=plot)
 
     def chromossomePredict(self, solution):
         chr_size = len(self.genes)

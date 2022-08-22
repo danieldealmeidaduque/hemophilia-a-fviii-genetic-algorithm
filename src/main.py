@@ -31,6 +31,7 @@ MUTATION_TYPE = 'random'  # random
 MUTATION_PERCENT_GENES = 10  # 10
 # gene limit values
 # GENE_SPACE = {'low': 0, 'high': 10}
+# -1 e 1 roda 10 vezes e olha os parametros >> aumenta o intervalo com base nos resultados
 
 
 # @ exception_handler

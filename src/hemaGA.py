@@ -48,7 +48,7 @@ class Gene():
         if max - min != 0:
             fitness_normalized = [(v - min) / (max - min) for v in fitness]
         else:
-            fitness_normalized = -1
+            fitness_normalized = -1  # discretize error: jogar fora >> ver outras soluções
 
         self.df['fitness_normalized'] = fitness_normalized
 
@@ -61,7 +61,7 @@ class Gene():
             elif value >= ub and value <= 1:
                 return 'Severe'  # 2
             else:
-                return 'Moderate'  # discretize error: classify as moderate
+                return 'Moderate'  # discretize error: jogar fora >> ver outras soluções
 
         self.df['fitness_discretized'] = self.df['fitness_normalized'].apply(
             discretize)

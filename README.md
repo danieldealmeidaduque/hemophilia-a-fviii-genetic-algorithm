@@ -1,4 +1,4 @@
-# Hemophilia Genetic Algorithm Python
+# Hemophilia - Genetic Algorithm - Python
 
 ## Description
 

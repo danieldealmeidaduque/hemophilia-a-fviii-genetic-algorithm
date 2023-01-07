@@ -2,10 +2,6 @@
 
 ## Description
 
-This project have several functionalities such as:
-
-Obs: Here "sequence" is the same as "sequence of amino acids"
-
 ### genetic_algorithm_hemophilia.py
 
 #### input

@@ -27,10 +27,9 @@
 
 
 
-<h3 align="center"> Hemophilia A - FVIII | Point Mutations | Severity | Genetic Algorithm </h3>
+<h3 align="center"> Using Genetic Algorithm to Predict the Severity of Hemophilia A and Identify Potential Biomarkers from FVIII Mutations Data </h3>
 
   <p align="center">
-    Uses point mutation, amino acids distance matrix and relative surface area to try to predict severity
     <br />
     <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticalgorithm"><strong>Explore the docs »</strong></a>
     <br />
@@ -75,9 +74,16 @@
 ## About The Project
 
 <p align="justify">
-    Hemophilia A is defined by mutations in a protein called factor VIII and is divided in three severities: mild, moderate and severe. This project uses a distance matrix for amino acids mutations, a file that has the value of relative surface area for each position and respective amino acid and a point mutation database with characteristics such as location, domain, mutation type and severity of the disease. After merging these three files a genetic algorithm is applied to verify if is possible to predict the severity based upon the information of the given files.
+  Hemophilia A is a genetic disorder caused by mutations in the FVIII protein, which is classified into three severities: mild, moderate, and severe.
 </p>
 
+<p align="justify">
+  This project utilizes several data files, including a distance matrix for amino acid mutations, a file with the relative surface area values for each position and corresponding amino acid, and a point mutation database with information on the location, domain, mutation type, and severity of the disease.
+</p>
+
+<p align="justify">
+  These data files are merged to create a comprehensive dataset. A genetic algorithm is then applied to the dataset to determine if it is possible to predict the severity of the disease based on the provided information. The algorithm searches for the best combination of features that will accurately predict the disease severity. By using this approach, the project aims to identify potential biomarkers that can assist in the diagnosis and treatment of Hemophilia A.
+</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started

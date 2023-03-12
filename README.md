@@ -27,7 +27,10 @@
 
 
 
-<h3 align="center"> Using Genetic Algorithm to Predict the Severity of Hemophilia A and Identify Potential Biomarkers from FVIII Mutations Data </h3>
+<h3 align="center"> Using Genetic Algorithm to Predict the Severity of Hemophilia A 
+  <br/>
+  and Identify Potential Biomarkers from FVIII Mutations Data 
+</h3>
 
   <p align="center">
     <br />

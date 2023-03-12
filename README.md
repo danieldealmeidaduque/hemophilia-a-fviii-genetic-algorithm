@@ -27,9 +27,10 @@
 
 
 
-<h3 align="center"> Hemophilia A - FVIII | Diagnosis | Genetic Algorithm </h3>
+<h3 align="center"> Hemophilia A - FVIII | Point Mutations | Severity | Genetic Algorithm </h3>
 
   <p align="center">
+    Uses point mutation, amino acids distance matrix and relative surface area to try to predict severity
     <br />
     <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticalgorithm"><strong>Explore the docs »</strong></a>
     <br />
@@ -74,7 +75,7 @@
 ## About The Project
 
 <p align="justify">
-    Hemophilia A - FVIII | Diagnosis | Genetic Algorithm
+    Hemophilia A is defined by mutations in a protein called factor VIII and is divided in three severities: mild, moderate and severe. This project uses a distance matrix for amino acids mutations, a file that has the value of relative surface area for each position and respective amino acid and a point mutation database with characteristics such as location, domain, mutation type and severity of the disease. After merging these three files a genetic algorithm is applied to verify if is possible to predict the severity based upon the information of the given files.
 </p>
 
 

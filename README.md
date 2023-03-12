@@ -83,7 +83,7 @@
 
 ### Prerequisites
 
-Install the following python libraries: numpy, pandas and BioPython
+Install the following python libraries: numpy, pandas, scikit-learn, matplotlib, pygad and BioPython
 
   ```sh
   pip install numpy

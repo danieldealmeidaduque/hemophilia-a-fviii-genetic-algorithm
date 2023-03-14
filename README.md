@@ -34,13 +34,13 @@
 
   <p align="center">
     <br />
-    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticalgorithm"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticAlgorithm"><strong>Explore the docs »</strong></a>
     <br />
     02/22 - 09/22
     <br />
-    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticalgorithm">Report Bug</a>
+    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticAlgorithm">Report Bug</a>
     ·
-    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticalgorithm">Request Feature</a>
+    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-diagnosis-geneticAlgorithm">Request Feature</a>
   </p>
 </div>
 

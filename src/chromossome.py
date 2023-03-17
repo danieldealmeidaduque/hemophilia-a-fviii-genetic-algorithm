@@ -1,14 +1,13 @@
 import pandas as pd
 
-from auxiliar import create_confusion_matrix
+from auxiliar import create_confusion_matrix, math_func
 from gene import Gene
-from math_func import math_func
-
-N_MATH = 4  # dist * rsa
 
 
 class Chromossome(Gene):
     """Chromossome is several genes with different mutations"""
+
+    N_MATH = 4  # dist * rsa
 
     def __init__(self, genes=[]):
         self.genes = genes

@@ -1,13 +1,10 @@
-import pandas as pd
-
-from auxiliar import create_confusion_matrix
-from math_func import math_func
-
-N_MATH = 4  # dist * rsa
+from auxiliar import math_func
 
 
 class Gene:
     """Gene is one dataframe grouped by same mutation"""
+
+    N_MATH = 4  # dist * rsa
 
     def __init__(self, df_key, df_value):
         self.wild_aa, self.new_aa = df_key
@@ -37,7 +34,7 @@ class Gene:
 
     def calculateFitness(self, s):
         def fitness(x):
-            fitness = math_func[N_MATH](x=x, s=s)
+            fitness = math_func[self.N_MATH](x=x, s=s)
             fitness = fitness
             return fitness
 

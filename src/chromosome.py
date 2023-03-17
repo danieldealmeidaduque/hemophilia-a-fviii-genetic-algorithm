@@ -5,8 +5,8 @@ from sklearn.metrics import confusion_matrix
 from gene import Gene
 
 
-class Chromossome(Gene):
-    """Chromossome is a list of genes"""
+class Chromosome(Gene):
+    """chromosome is a list of genes"""
 
     def __init__(self, df):
         # TEMPORARY BECAUSE OF DISTANCE NaN
@@ -18,7 +18,7 @@ class Chromossome(Gene):
         self.solutio_fitness = None
 
     def __str__(self, n=5):
-        print(f"Chromossome has {len(self.genes)} genes")
+        print(f"chromosome has {len(self.genes)} genes")
         for g in self.genes.iloc[:n]:
             print(g)
         return ""

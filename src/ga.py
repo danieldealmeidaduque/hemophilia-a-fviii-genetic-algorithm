@@ -4,7 +4,7 @@ from time import process_time
 import pygad
 
 from auxiliar import exception_handler, finished_time, format, plot_confusion_matrix
-from chromossome import Chromossome
+from chromosome import Chromosome
 from gene import Gene
 
 
@@ -44,7 +44,7 @@ class GA:
         ga_start_time = process_time()
         df_grouped = df.groupby(["wild_aa", "new_aa"])  # is the chromossome
         self.genes = [Gene(k, v) for k, v in df_grouped]  # all genes
-        self.chromossome = Chromossome(self.genes)  # chromossome class
+        self.chromossome = Chromosome(self.genes)  # chromossome class
 
     def __str__(self):
         cm = self.chromossome._getConfusionMatrix()

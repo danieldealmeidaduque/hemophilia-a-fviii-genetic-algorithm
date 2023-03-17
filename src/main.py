@@ -2,7 +2,7 @@ from os.path import abspath, dirname, join
 
 import pandas as pd
 
-from chromossome import Chromossome
+from chromosome import Chromosome
 from gene import Gene
 
 if __name__ == "__main__":
@@ -30,15 +30,15 @@ if __name__ == "__main__":
     # ga_gene.fitness_discretize()
     # print(ga_gene)
 
-    # GA chromossome
-    ga_chromossome = Chromossome(df)
-    print(ga_chromossome)
-    ga_chromossome.fitness_calculate()
+    # GA chromosome
+    ga_chromosome = Chromosome(df)
+    print(ga_chromosome)
+    ga_chromosome.fitness_calculate()
     print(f"Fitness calculation for chromosome")
-    print(ga_chromossome)
-    ga_chromossome.fitness_normalize()
+    print(ga_chromosome)
+    ga_chromosome.fitness_normalize()
     print(f"Fitness normalized for chromosome")
-    print(ga_chromossome)
-    ga_chromossome.fitness_discretize()
+    print(ga_chromosome)
+    ga_chromosome.fitness_discretize()
     print(f"Fitness discretized for chromosome")
-    print(ga_chromossome)
+    print(ga_chromosome)

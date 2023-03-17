@@ -1,10 +1,20 @@
 from os.path import abspath, dirname, join
 
 import pandas as pd
-
-from chromosome import Chromosome
 from ga import GA
+from sklearn import preprocessing
+
+from auxiliar import math_funcs
+from chromosome import Chromosome
 from gene import Gene
+
+
+def fitness_calculate(row, n=4):
+    d = row["Distance Wild and New"]
+    r = row["Relative Surface Area"]
+    f = math_funcs[n](d, r)
+    return f
+
 
 if __name__ == "__main__":
     """Get initial data and execute genetic algorithm"""
@@ -21,9 +31,15 @@ if __name__ == "__main__":
 
     # input dataframe with all needed informations for GA
     df = pd.read_excel(input_path, index_col=0)
-    # print(df)
+    print(df)
 
-    # # GA gene
+    for i in range(0, len(math_funcs)):
+        df[f"Mutation Fitness - Math Func[{i}]"] = df.apply(
+            lambda row: fitness_calculate(row, i), axis=1
+        )
+    print(df)
+
+    # GA gene
     # ga_gene = Gene(df.iloc[0])
     # print(ga_gene)
     # ga_gene.fitness_calculate()
@@ -46,8 +62,3 @@ if __name__ == "__main__":
     # ga_chromosome.fitness_solution()
     # print(f"Fitness solution for chromosome")
     # print(ga_chromosome)
-
-    # GA
-    ga = GA(df)
-    ga.setup()
-    ga.execute()

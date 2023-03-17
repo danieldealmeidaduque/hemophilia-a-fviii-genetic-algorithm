@@ -26,13 +26,4 @@ class Gene:
         f = math_funcs[n](d, r)
         self.fitness = f
 
-    def fitness_discretize(self, lower_bound=0.33, upper_bound=0.66):
-        f = self.fitness
-        if f > 0 and f <= lower_bound:
-            self.sev_pred = "Mild"
-        elif f > lower_bound and f <= upper_bound:
-            self.sev_pred = "Moderate"
-        elif f > upper_bound and f <= 1:
-            self.sev_pred = "Severe"
-        else:
-            self.sev_pred = None
+    

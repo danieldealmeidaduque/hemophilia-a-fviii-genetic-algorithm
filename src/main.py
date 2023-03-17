@@ -3,6 +3,7 @@ from os.path import abspath, dirname, join
 import pandas as pd
 
 from chromosome import Chromosome
+from ga import GA
 from gene import Gene
 
 if __name__ == "__main__":
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     df = pd.read_excel(input_path, index_col=0)
     # print(df)
 
-    # GA gene
+    # # GA gene
     # ga_gene = Gene(df.iloc[0])
     # print(ga_gene)
     # ga_gene.fitness_calculate()
@@ -31,14 +32,22 @@ if __name__ == "__main__":
     # print(ga_gene)
 
     # GA chromosome
-    ga_chromosome = Chromosome(df)
-    print(ga_chromosome)
-    ga_chromosome.fitness_calculate()
-    print(f"Fitness calculation for chromosome")
-    print(ga_chromosome)
-    ga_chromosome.fitness_normalize()
-    print(f"Fitness normalized for chromosome")
-    print(ga_chromosome)
-    ga_chromosome.fitness_discretize()
-    print(f"Fitness discretized for chromosome")
-    print(ga_chromosome)
+    # ga_chromosome = Chromosome(df)
+    # print(ga_chromosome)
+    # ga_chromosome.fitness_calculate()
+    # print(f"Fitness calculation for chromosome")
+    # print(ga_chromosome)
+    # ga_chromosome.fitness_normalize()
+    # print(f"Fitness normalized for chromosome")
+    # print(ga_chromosome)
+    # ga_chromosome.fitness_discretize()
+    # print(f"Fitness discretized for chromosome")
+    # print(ga_chromosome)
+    # ga_chromosome.fitness_solution()
+    # print(f"Fitness solution for chromosome")
+    # print(ga_chromosome)
+
+    # GA
+    ga = GA(df)
+    ga.setup()
+    ga.execute()

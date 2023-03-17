@@ -10,9 +10,10 @@ class Gene:
         self.pos = int(row["HGVS Position"])
         self.rsa = float(row["Relative Surface Area"])
         self.dist = float(row["Distance Wild and New"])
-        self.sev = str(row["Reported Severity"])
-        self.n_math_func = n_math_func
+        self.sev_true = str(row["Reported Severity"])
+        self.sev_pred = None
         self.fitness = None
+        self.n_math_func = n_math_func
 
     def __str__(self):
         print(func2str(math_funcs[self.n_math_func]), end=" | ")
@@ -28,10 +29,10 @@ class Gene:
     def fitness_discretize(self, lower_bound=0.33, upper_bound=0.66):
         f = self.fitness
         if f > 0 and f <= lower_bound:
-            self.fitness = "Mild"
+            self.sev_pred = "Mild"
         elif f > lower_bound and f <= upper_bound:
-            self.fitness = "Moderate"
+            self.sev_pred = "Moderate"
         elif f > upper_bound and f <= 1:
-            self.fitness = "Severe"
+            self.sev_pred = "Severe"
         else:
-            self.fitness = None
+            self.sev_pred = None

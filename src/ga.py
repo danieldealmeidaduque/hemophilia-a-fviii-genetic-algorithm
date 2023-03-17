@@ -1,109 +1,90 @@
-from os.path import abspath, dirname, join
-from time import process_time
-
+import numpy as np
 import pygad
 
-from auxiliar import exception_handler, finished_time, format, plot_confusion_matrix
+from auxiliar import exception_handler, finished_time
 from chromosome import Chromosome
-from gene import Gene
 
 
 @exception_handler
 class GA:
-    """function to execute the genetic algorithm"""
+    """GA is a class to setup and execute pygad ga using my gene and chromosome classes"""
 
     # ---- GA CONSTANTS ----
-    # 50 generations + 50 sol per pop = 5 min de execucao
-    # 50 generations + 100 sol per pop = 15 min de execucao
 
     # number of generations
-    NUM_GENERATIONS = 50  # 50
+    NUM_GENERATIONS = 50
     # number of solutions to be selected as parents
-    NUM_PARENTS_MATING = 5  # 5
+    NUM_PARENTS_MATING = 5
     # number of solutions (chromossomes)
-    SOL_PER_POP = 50  # 50
+    SOL_PER_POP = 50
     # sss | rws | rank | tournament
-    PARENT_SELECTION_TYPE = "rank"  # rank
+    PARENT_SELECTION_TYPE = "rank"
     # number of parents to keep in the current population
-    KEEP_PARENTS = 1  # 1
+    KEEP_PARENTS = 1
     # single_point | two_points | uniform | scattered | a custom crossover function
-    CROSSOVER_TYPE = "uniform"  # uniform
+    CROSSOVER_TYPE = "uniform"
     # probability of crossover
-    CROSSOVER_PROBABILITY = 0.9  # 0.9
+    CROSSOVER_PROBABILITY = 0.9
     # random | swap | inversion | scramble | adaptive | a custom mutation function
-    MUTATION_TYPE = "random"  # random
+    MUTATION_TYPE = "random"
     # percentage of genes to mutate
     MUTATION_PERCENT_GENES = 10  # 10
     # gene limit values
     # GENE_SPACE = {'low': 0, 'high': 10}
-    # -1 e 1 roda 10 vezes e olha os parametros >> aumenta o intervalo com base nos resultados
 
-    def __init__(self, df, output_dir):
-        print("Initiating GA...")
-        self.output_dir = output_dir
-        ga_start_time = process_time()
-        df_grouped = df.groupby(["wild_aa", "new_aa"])  # is the chromossome
-        self.genes = [Gene(k, v) for k, v in df_grouped]  # all genes
-        self.chromossome = Chromosome(self.genes)  # chromossome class
+    def __init__(self, df):
+        self.solution = Chromosome(df).genes
+        self.chromosome = Chromosome(df)
 
     def __str__(self):
-        cm = self.chromossome._getConfusionMatrix()
-        output_cm_path = join(self.output_dir, "cm")
-        plot_confusion_matrix(cm, output_path=None)
-        return str(output_cm_path)
+        print(self.best_solution)
+        print(self.best_solution_idx)
+        print(self.best_solution_fitness)
+        return ""
 
-    def fitness(self, solution, solution_idx):
-        """pygad fitness function to give as a parameter"""
-        self.chromossome.chromossome_predict(solution)
-        self.chromossome.create_confusion_matrix()
-        self.chromossome._setFitness()
-        self.chromossome._setSolution(solution)
+    def on_generation(self):
+        print(f"\tOn Generation ...")
+        # print(self)
 
-        self.solution_fitness = self.chromossome._getFitness()
-        self.solution = solution
-        self.solution_idx = solution_idx
-        return self.solution_fitness
+    def setup(self):
+        """Function to setup GA parameters"""
+        print("Setting up GA parameters...")
 
-    def prepare(self):
-        """function to prepare ga parameters"""
-        print("Preparing GA...")
-        num_genes = len(self.chromossome._getGenes())
-        fitness_function = self.fitness()
+        def fitness_function(solution, solution_idx):
+            """Fitness Function to execute in pygad"""
+            print("Executing fitness function...")
 
-        def on_generation(ga_instance):
-            fit = self.chromossome._getFitness()
-            # s = self.chromossome._getSolution()
-            print(f"\n GENERATION - Fitness: {format(fit)}")
-            print(self.solution_fitness)
-            print(self.solution_idx)
-            print(self.solution)
+            solution = self.solution
+            fitness = self.chromosome.solution_calculation(solution)
 
-        ga_instance = pygad.GA(
+            return fitness
+
+        # setup GA instance
+        self.ga_instance = pygad.GA(
             num_generations=self.NUM_GENERATIONS,
             num_parents_mating=self.NUM_PARENTS_MATING,
-            fitness_func=fitness_function,
             sol_per_pop=self.SOL_PER_POP,
-            num_genes=num_genes,
             parent_selection_type=self.PARENT_SELECTION_TYPE,
             keep_parents=self.KEEP_PARENTS,
             crossover_type=self.CROSSOVER_TYPE,
             crossover_probability=self.CROSSOVER_PROBABILITY,
-            on_generation=on_generation,
             mutation_type=self.MUTATION_TYPE,
             mutation_percent_genes=self.MUTATION_PERCENT_GENES,
-            #    gene_space=GENE_SPACE # fitness ficou fixo..
+            on_generation=self.on_generation(),
+            fitness_func=fitness_function,
+            num_genes=len(self.solution),
         )
 
-        return ga_instance
-
     def execute(self):
-        # prepare ga instance
-        ga_instance = self.prepare()
-        # run ga instance
-        ga_instance.run()
-        # get output parameters
-        solution, solution_fitness, solution_idx = ga_instance.best_solution()
-        # plot fitness function per generation
-        ga_instance.plot_fitness(save_dir=self.output_path)
+        # run GA
+        self.ga_instance.run()
 
-        finished_time(self.ga_start_time, "GA ALGORITHM")
+        # get best solution
+        solution, solution_fitness, solution_idx = self.ga_instance.best_solution()
+
+        self.best_solution = solution
+        self.best_solution_idx = solution_idx
+        self.best_solution_fitness = solution_fitness
+
+        # plot fitness function per generation
+        self.ga_instance.plot_fitness()

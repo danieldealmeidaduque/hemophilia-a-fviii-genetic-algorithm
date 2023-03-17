@@ -15,13 +15,13 @@ class Chromosome(Gene):
         self.genes = df.apply(lambda row: Gene(row), axis=1)
         self.solution = None
         self.solution_idx = None
-        self.solutio_fitness = None
+        self.solution_fitness = None
 
     def __str__(self, n=5):
         print(f"chromosome has {len(self.genes)} genes")
         for g in self.genes.iloc[:n]:
             print(g)
-        return ""
+        return f"{self.solution_fitness=}\n"
 
     def create_confusion_matrix(self):
         y_true = [g.sev for g in self.genes]
@@ -44,3 +44,24 @@ class Chromosome(Gene):
 
         for index, g in enumerate(self.genes):
             g.fitness = fitness_list_normalized[index]
+
+    def fitness_solution(self):
+        f = 0
+        for g in self.genes:
+            print(g.sev_pred, g.sev_true)
+            if g.sev_pred == g.sev_true:
+                f += 1
+        self.solution_fitness = f
+
+    def solution_calculation(self, solution):
+        # redefine the distance as solution[index]
+        for index, gene in enumerate(self.genes):
+            gene.dist = solution[index]
+
+        # calculate fitness with pygad solution as new distance
+        self.fitness_calculate()
+        self.fitness_normalize()
+        self.fitness_discretize()
+        self.fitness_solution()
+
+        return self.solution_fitness

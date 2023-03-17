@@ -54,8 +54,8 @@ class GA:
 
     def fitness(self, solution, solution_idx):
         """pygad fitness function to give as a parameter"""
-        self.chromossome.chromossomePredict(solution)
-        self.chromossome._setConfusionMatrix()
+        self.chromossome.chromossome_predict(solution)
+        self.chromossome.create_confusion_matrix()
         self.chromossome._setFitness()
         self.chromossome._setSolution(solution)
 

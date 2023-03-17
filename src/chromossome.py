@@ -1,64 +1,46 @@
-import pandas as pd
+import numpy as np
+from sklearn import preprocessing
+from sklearn.metrics import confusion_matrix
 
-from auxiliar import create_confusion_matrix, math_func
 from gene import Gene
 
 
 class Chromossome(Gene):
-    """Chromossome is several genes with different mutations"""
+    """Chromossome is a list of genes"""
 
-    N_MATH = 4  # dist * rsa
+    def __init__(self, df):
+        # TEMPORARY BECAUSE OF DISTANCE NaN
+        df = df[df["HGVS New Amino Acid"] != "*"]
 
-    def __init__(self, genes=[]):
-        self.genes = genes
-        self.cm = 0
-        self.fitness = 0
-        self.solution = []
+        self.genes = df.apply(lambda row: Gene(row), axis=1)
+        self.solution = None
+        self.solution_idx = None
+        self.solutio_fitness = None
 
-    def __str__(self):
-        return f"CHROMOSSOME has {len(self.genes)} genes"
+    def __str__(self, n=5):
+        print(f"Chromossome has {len(self.genes)} genes")
+        for g in self.genes.iloc[:n]:
+            print(g)
+        return ""
 
-    def _getGenes(self):
-        return self.genes
+    def create_confusion_matrix(self):
+        y_true = [g.sev for g in self.genes]
+        y_pred = [g.fitness_discretize().fitness for g in self.genes]
 
-    def _getSolution(self):
-        return self.solution
+        cm = confusion_matrix(y_true, y_pred, normalize="true", plot=True)
+        return cm
 
-    def _setSolution(self, solution):
-        self.solution = solution
+    def fitness_calculate(self):
+        for g in self.genes:
+            g.fitness_calculate()
 
-    def _getFitness(self):
-        return self.fitness
+    def fitness_discretize(self):
+        for g in self.genes:
+            g.fitness_discretize()
 
-    def _setFitness(self):
-        self.fitness = self.cm[0][0] + self.cm[1][1] + self.cm[2][2]
+    def fitness_normalize(self):
+        fitness_list = [g.fitness for g in self.genes]
+        fitness_list_normalized = preprocessing.normalize([fitness_list])[0]
 
-    def _getConfusionMatrix(self):
-        return self.cm
-
-    def _setConfusionMatrix(self, plot=False):
-        merged_df = self.mergeGenesDataframes()
-        y_true = merged_df["severity"].values
-        y_pred = merged_df["fitness_discretized"].values
-
-        self.cm = create_confusion_matrix(y_true, y_pred, normalize="true", plot=plot)
-
-    def chromossomePredict(self, solution):
-        chr_size = len(self.genes)
-        sol_size = len(solution)
-
-        if chr_size == sol_size:
-            # print('Solution and Chromossome have the same size')
-            for index, gene in enumerate(self.genes):
-                s = solution[index]
-                gene.genePredict(s)
-        else:
-            print("Solution and Chromossome DONT have the same size!!!!")
-
-    def mergeGenesDataframes(self):
-        df = pd.DataFrame()
-        for gene in self.genes:
-            gene_df = gene._getDataFrame()
-            df = pd.concat([df, gene_df])
-
-        return df
+        for index, g in enumerate(self.genes):
+            g.fitness = fitness_list_normalized[index]

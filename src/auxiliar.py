@@ -4,56 +4,50 @@ import sys
 from math import sqrt
 from time import process_time
 
-from matplotlib import pyplot as plt
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    accuracy_score,
-    balanced_accuracy_score,
-    confusion_matrix,
-    f1_score,
-    precision_score,
-)
-
 # ------------------------ Mathematical Functions -------------------------------- #
 
 
-math_func = {
-    0: lambda x, s: abs(x - s),
-    1: lambda x, s: x + s,
-    2: lambda x, s: pow(x, 2) + s,
-    3: lambda x, s: pow(x, 3) + s,
-    4: lambda x, s: x * s,
-    5: lambda x, s: pow(x, 2) * s,
-    6: lambda x, s: pow(x, 3) * s,
-    7: lambda x, s: pow(x, s),
-    8: lambda x, s: pow(x, pow(s, 2)),
-    9: lambda x, s: pow(x, 2) + pow(s, 2),
-    10: lambda x, s: pow(x, 3) + pow(s, 2),
-    11: lambda x, s: abs(pow(x, s) - abs(x - s)),
-    12: lambda x, s: abs(pow(x, 2) - abs(x - s)),
-    13: lambda x, s: abs(pow(x, 3) - abs(x - s)),
-    14: lambda x, s: abs(pow(x, pow(s, 2)) - abs(x - s)),
-    15: lambda x, s: abs(pow(x, abs(x - s)) - abs(x - s)),
-    16: lambda x, s: abs(pow(x, pow(abs(x - s), 2)) - abs(x - s)),
-    17: lambda x, s: abs(pow(x, pow(abs(x - s), 3)) - abs(x - s)),
-    18: lambda x, s: sqrt(abs(x - s)),
-    19: lambda x, s: sqrt(abs(x + s)),
-    20: lambda x, s: sqrt(abs(pow(x, 2) + s)),
-    21: lambda x, s: sqrt(abs(pow(x, 3) + s)),
-    22: lambda x, s: sqrt(abs(x * s)),
-    23: lambda x, s: sqrt(abs(pow(x, 2) * s)),
-    24: lambda x, s: sqrt(abs(pow(x, 3) * s)),
-    25: lambda x, s: sqrt(abs(pow(x, s))),
-    26: lambda x, s: sqrt(abs(pow(x, pow(s, 2)))),
-    27: lambda x, s: sqrt(abs(pow(x, 2) + pow(s, 2))),
-    28: lambda x, s: sqrt(abs(pow(x, 3) + pow(s, 2))),
-    29: lambda x, s: sqrt(abs(pow(x, s) - abs(x - s))),
-    30: lambda x, s: sqrt(abs(pow(x, 2) - abs(x - s))),
-    31: lambda x, s: sqrt(abs(pow(x, 3) - abs(x - s))),
-    32: lambda x, s: sqrt(abs(pow(x, pow(s, 2)) - abs(x - s))),
-    33: lambda x, s: sqrt(abs(pow(x, abs(x - s)) - abs(x - s))),
-    34: lambda x, s: sqrt(abs(pow(x, pow(abs(x - s), 2)) - abs(x - s))),
-    35: lambda x, s: sqrt(abs(pow(x, pow(abs(x - s), 3)) - abs(x - s))),
+math_funcs = {
+    0: lambda dist, rsa: abs(dist - rsa),
+    1: lambda dist, rsa: dist + rsa,
+    2: lambda dist, rsa: pow(dist, 2) + rsa,
+    3: lambda dist, rsa: pow(dist, 3) + rsa,
+    4: lambda dist, rsa: dist * rsa,
+    5: lambda dist, rsa: pow(dist, 2) * rsa,
+    6: lambda dist, rsa: pow(dist, 3) * rsa,
+    7: lambda dist, rsa: pow(dist, rsa),
+    8: lambda dist, rsa: pow(dist, pow(rsa, 2)),
+    9: lambda dist, rsa: pow(dist, 2) + pow(rsa, 2),
+    10: lambda dist, rsa: pow(dist, 3) + pow(rsa, 2),
+    11: lambda dist, rsa: abs(pow(dist, rsa) - abs(dist - rsa)),
+    12: lambda dist, rsa: abs(pow(dist, 2) - abs(dist - rsa)),
+    13: lambda dist, rsa: abs(pow(dist, 3) - abs(dist - rsa)),
+    14: lambda dist, rsa: abs(pow(dist, pow(rsa, rsa)) - abs(dist - rsa)),
+    15: lambda dist, rsa: abs(pow(dist, abs(dist - rsa)) - abs(dist - rsa)),
+    16: lambda dist, rsa: abs(pow(dist, pow(abs(dist - rsa), 2)) - abs(dist - rsa)),
+    17: lambda dist, rsa: abs(pow(dist, pow(abs(dist - rsa), 3)) - abs(dist - rsa)),
+    18: lambda dist, rsa: sqrt(abs(dist - rsa)),
+    19: lambda dist, rsa: sqrt(abs(dist + rsa)),
+    20: lambda dist, rsa: sqrt(abs(pow(dist, 2) + rsa)),
+    21: lambda dist, rsa: sqrt(abs(pow(dist, 3) + rsa)),
+    22: lambda dist, rsa: sqrt(abs(dist * rsa)),
+    23: lambda dist, rsa: sqrt(abs(pow(dist, 2) * rsa)),
+    24: lambda dist, rsa: sqrt(abs(pow(dist, 3) * rsa)),
+    25: lambda dist, rsa: sqrt(abs(pow(dist, rsa))),
+    26: lambda dist, rsa: sqrt(abs(pow(dist, pow(rsa, 2)))),
+    27: lambda dist, rsa: sqrt(abs(pow(dist, 2) + pow(rsa, 2))),
+    28: lambda dist, rsa: sqrt(abs(pow(dist, 3) + pow(rsa, 2))),
+    29: lambda dist, rsa: sqrt(abs(pow(dist, rsa) - abs(dist - rsa))),
+    30: lambda dist, rsa: sqrt(abs(pow(dist, 2) - abs(dist - rsa))),
+    31: lambda dist, rsa: sqrt(abs(pow(dist, 3) - abs(dist - rsa))),
+    32: lambda dist, rsa: sqrt(abs(pow(dist, pow(rsa, 2)) - abs(dist - rsa))),
+    33: lambda dist, rsa: sqrt(abs(pow(dist, abs(dist - rsa)) - abs(dist - rsa))),
+    34: lambda dist, rsa: sqrt(
+        abs(pow(dist, pow(abs(dist - rsa), 2)) - abs(dist - rsa))
+    ),
+    35: lambda dist, rsa: sqrt(
+        abs(pow(dist, pow(abs(dist - rsa), 3)) - abs(dist - rsa))
+    ),
 }
 
 
@@ -75,93 +69,77 @@ def exception_handler(func):
 
 
 @exception_handler
-def format(value):
-    return round(value, 3)
-
-
-@exception_handler
 def highlight(s):
     """print upper and lower highlighted text"""
     print("\n\t\t\t ----------- " + s.upper() + " ------------\n")
 
 
 @exception_handler
-def strip_string(s):
-    try:
-        s = s.strip()
-    finally:
-        return s
-
-
-@exception_handler
 def finished_time(start_time, finish_msg):
     """print finished time formatted"""
     f_time = process_time()
-    e_time = format((f_time - start_time))
-    msg = f"\n\t{finish_msg} - Finished  in {e_time} s.\n"
-    print(msg)
+    e_time = round((f_time - start_time), 2)
+    print(f"\n\t{finish_msg} - Finished  in {e_time} s.\n")
 
 
 @exception_handler
-def math_func2string(func):
+def func2str(func):
     """convert one line of math_func to a string"""
     line = inspect.getsourcelines(func)[0][0]
-    str_func = re.search("s:.*", line).group()[3:-1].strip()
-
-    return str_func
+    return re.search("rsa: .*", line).group()[5:-1].strip()
 
 
 # ----------------------------- Prediction Scores -------------------------------- #
 
 
-@exception_handler
-def scores(y_true, y_pred):
-    """function to calculate several scores based on y_true and y_pred"""
-    # print(y_true, y_pred)
+# @exception_handler
+# def scores(y_true, y_pred):
+#     """function to calculate several scores based on y_true and y_pred"""
+#     # print(y_true, y_pred)
 
-    avg = "macro"
+#     avg = "macro"
 
-    acc = format(accuracy_score(y_true, y_pred))
-    b_acc = format(balanced_accuracy_score(y_true, y_pred))
+#     acc = format(accuracy_score(y_true, y_pred))
+#     b_acc = format(balanced_accuracy_score(y_true, y_pred))
 
-    p = format(precision_score(y_true, y_pred, average=avg, zero_division=1))
-    f1 = format(f1_score(y_true, y_pred, average=avg, zero_division=1))
+#     p = format(precision_score(y_true, y_pred, average=avg, zero_division=1))
+#     f1 = format(f1_score(y_true, y_pred, average=avg, zero_division=1))
 
-    dict_scores = {
-        "accuracy_score": acc,  # = micro_f1_score, micro_recall_score and micro_precision_score
-        "balanced_accuracy_score": b_acc,  # = macro_recall_score
-        "macro_precision_score": p,
-        "macro_f1_score": f1,
-    }
+#     dict_scores = {
+#         "accuracy_score": acc,  # = micro_f1_score, micro_recall_score and micro_precision_score
+#         "balanced_accuracy_score": b_acc,  # = macro_recall_score
+#         "macro_precision_score": p,
+#         "macro_f1_score": f1,
+#     }
 
-    return dict_scores
-
-
-# ----------------------------- Confusion Matrix --------------------------------- #
+#     return dict_scores
 
 
-# @ exception_handler
-def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
-    labels = ["Mild", "Moderate", "Severe"]
-    cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
-
-    if plot:
-        disp = ConfusionMatrixDisplay(cm, display_labels=labels)
-        disp.plot()
-        plt.title("Confusion Matrix normalized by row")
-        plt.show()
-
-    return cm
+# # ----------------------------- Confusion Matrix --------------------------------- #
 
 
-# @ exception_handler
-def plot_confusion_matrix(cm, output_path=None):
-    labels = ["Mild", "Moderate", "Severe"]
+# # @ exception_handler
+# def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
+#     labels = ["Mild", "Moderate", "Severe"]
+#     cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
 
-    disp = ConfusionMatrixDisplay(cm, display_labels=labels)
-    disp.plot()
-    plt.title("Confusion Matrix normalized by row")
-    if output_path == None:
-        plt.show()
-    else:
-        plt.savefig(output_path)
+#     if plot:
+#         disp = ConfusionMatrixDisplay(cm, display_labels=labels)
+#         disp.plot()
+#         plt.title("Confusion Matrix normalized by row")
+#         plt.show()
+
+#     return cm
+
+
+# # @ exception_handler
+# def plot_confusion_matrix(cm, output_path=None):
+#     labels = ["Mild", "Moderate", "Severe"]
+
+#     disp = ConfusionMatrixDisplay(cm, display_labels=labels)
+#     disp.plot()
+#     plt.title("Confusion Matrix normalized by row")
+#     if output_path == None:
+#         plt.show()
+#     else:
+#         plt.savefig(output_path)

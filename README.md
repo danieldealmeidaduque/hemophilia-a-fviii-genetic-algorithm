@@ -38,9 +38,9 @@
     <br />
     02/22 - 09/22
     <br />
-    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-champMutation-geneticAlgorithm">Report Bug</a>
+    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-champMutation-geneticAlgorithm/issues">Report Bug</a>
     ·
-    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-champMutation-geneticAlgorithm">Request Feature</a>
+    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-champMutation-geneticAlgorithm/issues">Request Feature</a>
   </p>
 </div>
 

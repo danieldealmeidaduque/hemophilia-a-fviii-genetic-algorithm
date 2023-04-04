@@ -16,38 +16,22 @@ math_funcs = {
     5: lambda dist, rsa: pow(dist, 2) * rsa,
     6: lambda dist, rsa: pow(dist, 3) * rsa,
     7: lambda dist, rsa: pow(dist, rsa),
-    8: lambda dist, rsa: pow(dist, pow(rsa, 2)),
-    9: lambda dist, rsa: pow(dist, 2) + pow(rsa, 2),
-    10: lambda dist, rsa: pow(dist, 3) + pow(rsa, 2),
-    11: lambda dist, rsa: abs(pow(dist, rsa) - abs(dist - rsa)),
-    12: lambda dist, rsa: abs(pow(dist, 2) - abs(dist - rsa)),
-    13: lambda dist, rsa: abs(pow(dist, 3) - abs(dist - rsa)),
-    14: lambda dist, rsa: abs(pow(dist, pow(rsa, rsa)) - abs(dist - rsa)),
-    15: lambda dist, rsa: abs(pow(dist, abs(dist - rsa)) - abs(dist - rsa)),
-    16: lambda dist, rsa: abs(pow(dist, pow(abs(dist - rsa), 2)) - abs(dist - rsa)),
-    17: lambda dist, rsa: abs(pow(dist, pow(abs(dist - rsa), 3)) - abs(dist - rsa)),
-    18: lambda dist, rsa: sqrt(abs(dist - rsa)),
-    19: lambda dist, rsa: sqrt(abs(dist + rsa)),
-    20: lambda dist, rsa: sqrt(abs(pow(dist, 2) + rsa)),
-    21: lambda dist, rsa: sqrt(abs(pow(dist, 3) + rsa)),
-    22: lambda dist, rsa: sqrt(abs(dist * rsa)),
-    23: lambda dist, rsa: sqrt(abs(pow(dist, 2) * rsa)),
-    24: lambda dist, rsa: sqrt(abs(pow(dist, 3) * rsa)),
-    25: lambda dist, rsa: sqrt(abs(pow(dist, rsa))),
-    26: lambda dist, rsa: sqrt(abs(pow(dist, pow(rsa, 2)))),
-    27: lambda dist, rsa: sqrt(abs(pow(dist, 2) + pow(rsa, 2))),
-    28: lambda dist, rsa: sqrt(abs(pow(dist, 3) + pow(rsa, 2))),
-    29: lambda dist, rsa: sqrt(abs(pow(dist, rsa) - abs(dist - rsa))),
-    30: lambda dist, rsa: sqrt(abs(pow(dist, 2) - abs(dist - rsa))),
-    31: lambda dist, rsa: sqrt(abs(pow(dist, 3) - abs(dist - rsa))),
-    32: lambda dist, rsa: sqrt(abs(pow(dist, pow(rsa, 2)) - abs(dist - rsa))),
-    33: lambda dist, rsa: sqrt(abs(pow(dist, abs(dist - rsa)) - abs(dist - rsa))),
-    34: lambda dist, rsa: sqrt(
-        abs(pow(dist, pow(abs(dist - rsa), 2)) - abs(dist - rsa))
-    ),
-    35: lambda dist, rsa: sqrt(
-        abs(pow(dist, pow(abs(dist - rsa), 3)) - abs(dist - rsa))
-    ),
+    8: lambda dist, rsa: abs(pow(dist, rsa) - abs(dist - rsa)),
+    9: lambda dist, rsa: abs(pow(dist, 2) - abs(dist - rsa)),
+    10: lambda dist, rsa: abs(pow(dist, 3) - abs(dist - rsa)),
+    11: lambda dist, rsa: abs(pow(dist, abs(dist - rsa)) - abs(dist - rsa)),
+    12: lambda dist, rsa: sqrt(abs(dist - rsa)),
+    13: lambda dist, rsa: sqrt(abs(dist + rsa)),
+    14: lambda dist, rsa: sqrt(abs(pow(dist, 2) + rsa)),
+    15: lambda dist, rsa: sqrt(abs(pow(dist, 3) + rsa)),
+    16: lambda dist, rsa: sqrt(abs(dist * rsa)),
+    17: lambda dist, rsa: sqrt(abs(pow(dist, 2) * rsa)),
+    18: lambda dist, rsa: sqrt(abs(pow(dist, 3) * rsa)),
+    19: lambda dist, rsa: sqrt(abs(pow(dist, rsa))),
+    20: lambda dist, rsa: sqrt(abs(pow(dist, rsa) - abs(dist - rsa))),
+    21: lambda dist, rsa: sqrt(abs(pow(dist, 2) - abs(dist - rsa))),
+    22: lambda dist, rsa: sqrt(abs(pow(dist, 3) - abs(dist - rsa))),
+    23: lambda dist, rsa: sqrt(abs(pow(dist, abs(dist - rsa)) - abs(dist - rsa))),
 }
 
 
@@ -113,33 +97,3 @@ def func2str(func):
 #     }
 
 #     return dict_scores
-
-
-# # ----------------------------- Confusion Matrix --------------------------------- #
-
-
-# # @ exception_handler
-# def create_confusion_matrix(y_true, y_pred, normalize=None, plot=False):
-#     labels = ["Mild", "Moderate", "Severe"]
-#     cm = confusion_matrix(y_true, y_pred, labels=labels, normalize=normalize)
-
-#     if plot:
-#         disp = ConfusionMatrixDisplay(cm, display_labels=labels)
-#         disp.plot()
-#         plt.title("Confusion Matrix normalized by row")
-#         plt.show()
-
-#     return cm
-
-
-# # @ exception_handler
-# def plot_confusion_matrix(cm, output_path=None):
-#     labels = ["Mild", "Moderate", "Severe"]
-
-#     disp = ConfusionMatrixDisplay(cm, display_labels=labels)
-#     disp.plot()
-#     plt.title("Confusion Matrix normalized by row")
-#     if output_path == None:
-#         plt.show()
-#     else:
-#         plt.savefig(output_path)

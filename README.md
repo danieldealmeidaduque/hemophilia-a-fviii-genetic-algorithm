@@ -34,11 +34,11 @@
 
   <p align="center">
     <br />
-    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-geneticalgorithm"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-genetic-algorithm"><strong>Explore the docs »</strong></a>
     <br />
     02/22 - 09/22
     <br />
-    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-geneticalgorithm/issues">Report Bug</a>
+    <a href="https://github.com/danieldealmeidaduque/hemophilia-a-genetic-algorithm/issues">Report Bug</a>
   </p>
 </div>
 

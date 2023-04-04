@@ -36,7 +36,7 @@
     <br />
     <a href="https://github.com/danieldealmeidaduque/hemophilia-a-genetic-algorithm"><strong>Explore the docs »</strong></a>
     <br />
-    02/22 - 09/22
+    02/22 - 09/22 v1 | 03/23 v2
     <br />
     <a href="https://github.com/danieldealmeidaduque/hemophilia-a-genetic-algorithm/issues">Report Bug</a>
   </p>

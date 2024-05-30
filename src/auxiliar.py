@@ -73,27 +73,3 @@ def func2str(func):
     return re.search("rsa: .*", line).group()[5:-1].strip()
 
 
-# ----------------------------- Prediction Scores -------------------------------- #
-
-
-# @exception_handler
-# def scores(y_true, y_pred):
-#     """function to calculate several scores based on y_true and y_pred"""
-#     # print(y_true, y_pred)
-
-#     avg = "macro"
-
-#     acc = format(accuracy_score(y_true, y_pred))
-#     b_acc = format(balanced_accuracy_score(y_true, y_pred))
-
-#     p = format(precision_score(y_true, y_pred, average=avg, zero_division=1))
-#     f1 = format(f1_score(y_true, y_pred, average=avg, zero_division=1))
-
-#     dict_scores = {
-#         "accuracy_score": acc,  # = micro_f1_score, micro_recall_score and micro_precision_score
-#         "balanced_accuracy_score": b_acc,  # = macro_recall_score
-#         "macro_precision_score": p,
-#         "macro_f1_score": f1,
-#     }
-
-#     return dict_scores
